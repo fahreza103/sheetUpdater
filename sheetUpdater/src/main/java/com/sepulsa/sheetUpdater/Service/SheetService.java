@@ -45,6 +45,8 @@ public class SheetService {
     /** Global instance of the HTTP transport. */
     private static HttpTransport HTTP_TRANSPORT;
     
+    private static final int DEFAULT_PORT = 8181;
+    
     @Value("${server.port}")
     private String appPort;
 
@@ -72,6 +74,10 @@ public class SheetService {
      * @throws IOException
      */
     public  Credential authorize() throws IOException {
+    	if(appPort == null || "".equals(appPort)) {
+    		appPort = Integer.toString(DEFAULT_PORT);
+    	}
+    	
         // Load client secrets.
         InputStream in =
         		SheetService.class.getResourceAsStream("/client_secret.json");
