@@ -23,7 +23,7 @@ public class SheetUpdaterController {
 	
 	private Sheets sheet;
 	
-	@RequestMapping("/CallBack")
+	@RequestMapping("/Callback")
 	public String callBack () throws IOException {
 		return "OK";
 	}
