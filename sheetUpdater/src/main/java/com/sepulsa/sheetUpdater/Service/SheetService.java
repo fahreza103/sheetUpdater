@@ -74,7 +74,10 @@ public class SheetService {
      * @throws IOException
      */
     public  Credential authorize() throws IOException {
-    	if(appPort == null || "".equals(appPort)) {
+    	
+    	log.info("Default Port :"+DEFAULT_PORT);
+    	if(appPort == null || "-1".equals(appPort)) {
+    		log.info("appPort is empty or -1, use default port instead");
     		appPort = Integer.toString(DEFAULT_PORT);
     	}
     	
