@@ -3,7 +3,10 @@ package com.sepulsa.sheetUpdater.controller;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +15,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.Service.SheetService;
 
 @RestController
+@EnableAutoConfiguration
 public class SheetUpdaterController {
 
 	@Autowired
@@ -27,7 +31,7 @@ public class SheetUpdaterController {
 	
 	
 	@RequestMapping("/updateSheet")
-	public String updateSheet () throws IOException {
+	public String updateSheet (HttpServletRequest request) throws IOException {
         // Build a new authorized API client service.
 		sheet = sheetService.getSheetsService();
         String spreadsheetId = "1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI";
