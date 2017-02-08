@@ -89,7 +89,7 @@ public class SheetService {
         LocalServerReceiver localReceiver = new LocalServerReceiver.
                 Builder().setHost("localhost").setPort(Integer.parseInt(appPort)).build();
         
-        log.info("appPort");
+        log.info(appPort);
         log.info(localReceiver);
         Credential credential = new AuthorizationCodeInstalledApp(
             flow, localReceiver).authorize("user");
