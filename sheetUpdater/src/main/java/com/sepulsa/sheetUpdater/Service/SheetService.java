@@ -87,7 +87,7 @@ public class SheetService {
                 .build();
         
         LocalServerReceiver localReceiver = new LocalServerReceiver.
-                Builder().setHost("localhost").setPort(Integer.parseInt("9090")).build();
+                Builder().setHost("localhost").setPort(Integer.parseInt(appPort)).build();
         
         log.info(appPort);
         log.info(localReceiver);
