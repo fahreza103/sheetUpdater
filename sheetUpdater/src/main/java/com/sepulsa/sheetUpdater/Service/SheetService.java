@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -20,7 +21,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.ValueRange;
 
 @Component
 public class SheetService {
@@ -41,6 +41,9 @@ public class SheetService {
 
     /** Global instance of the HTTP transport. */
     private static HttpTransport HTTP_TRANSPORT;
+    
+    @Value("${server.port}")
+    private String appPort;
 
     /** Global instance of the scopes required by this quickstart.
      *
@@ -65,7 +68,7 @@ public class SheetService {
      * @return an authorized Credential object.
      * @throws IOException
      */
-    public static Credential authorize() throws IOException {
+    public  Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in =
         		SheetService.class.getResourceAsStream("/client_secret.json");
@@ -81,7 +84,7 @@ public class SheetService {
                 .build();
         
         LocalServerReceiver localReceiver = new LocalServerReceiver.
-                Builder().setHost("localhost").setPort(8080).build();
+                Builder().setHost("localhost").setPort(Integer.parseInt(appPort)).build();
         
         Credential credential = new AuthorizationCodeInstalledApp(
             flow, localReceiver).authorize("user");
