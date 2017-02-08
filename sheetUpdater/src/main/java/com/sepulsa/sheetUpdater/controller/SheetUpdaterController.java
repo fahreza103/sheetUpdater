@@ -33,8 +33,7 @@ public class SheetUpdaterController {
 		return "OK";
 	}
 	
-	@RequestMapping(value = "/webHookListener",
-					consumes = "text/plain")
+	@RequestMapping(value = "/webHookListener")
 	public String webHookListener (@RequestBody String activity) {
 		log.info("JSON String : "+activity);
 		return activity;
