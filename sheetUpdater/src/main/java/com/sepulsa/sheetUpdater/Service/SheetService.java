@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,8 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 
 @Component
 public class SheetService {
+	private Logger log = Logger.getLogger(SheetService.class);
+	
     /** Application name. */
     private static final String APPLICATION_NAME =
         "Google Sheets API Java Quickstart";
@@ -86,6 +89,8 @@ public class SheetService {
         LocalServerReceiver localReceiver = new LocalServerReceiver.
                 Builder().setHost("localhost").setPort(Integer.parseInt(appPort)).build();
         
+        log.info("appPort");
+        log.info(localReceiver);
         Credential credential = new AuthorizationCodeInstalledApp(
             flow, localReceiver).authorize("user");
         System.out.println(
