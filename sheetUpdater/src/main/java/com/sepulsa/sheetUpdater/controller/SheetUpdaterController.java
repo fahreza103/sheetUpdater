@@ -34,7 +34,6 @@ public class SheetUpdaterController {
 	}
 	
 	@RequestMapping(value = "/webHookListener",
-					method = RequestMethod.POST,
 					consumes = "text/plain")
 	public String webHookListener (@RequestBody String activity) {
 		log.info("JSON String : "+activity);
