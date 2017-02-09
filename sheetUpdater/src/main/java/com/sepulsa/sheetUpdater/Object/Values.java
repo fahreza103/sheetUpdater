@@ -11,12 +11,22 @@ public class Values implements Serializable {
 
 	private static final long serialVersionUID = -2290819477971877049L;
 	
+	@JsonProperty("id")
+	private String id;
+	@JsonProperty("story_id")
+	private String storyId;
+	@JsonProperty("text")
+	private String text;
+	@JsonProperty("person_id")
+	private String personId;
 	@JsonProperty("counts")
 	private Counts counts;
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("estimate")
 	private long estimate;
+	@JsonProperty("created_at")
+	private long createdAt;
 	@JsonProperty("updated_at")
 	private long updatedAt;
 	
