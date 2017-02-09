@@ -46,6 +46,12 @@ public class SheetUpdaterController {
 		return json;
 	}
 	
+	@RequestMapping("/authorize")
+	public String authorize (HttpServletRequest request) throws IOException {
+		sheet = sheetService.getSheetsService();
+		return sheet.getApplicationName()+"OK";
+	}
+	
 	
 	@RequestMapping("/updateSheet")
 	public String updateSheet (HttpServletRequest request) throws IOException {
