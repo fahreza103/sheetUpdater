@@ -3,8 +3,10 @@ package com.sepulsa.sheetUpdater.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -26,6 +28,7 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.Object.Content;
 import com.sepulsa.sheetUpdater.Object.WebHook;
+import com.sepulsa.sheetUpdater.util.DateTool;
 
 @Component
 public class SheetService {
@@ -49,8 +52,9 @@ public class SheetService {
     /** Global instance of the HTTP transport. */
     private static HttpTransport HTTP_TRANSPORT;
     
+    private Sheets sheet;
     
-    private static final int DEFAULT_PORT = 8181;
+    private final int DEFAULT_PORT = 8181;
     
     @Value("${server.port}")
     private String appPort;
@@ -124,52 +128,89 @@ public class SheetService {
      * @throws IOException
      */
     public Sheets getSheetsService() throws IOException {
-        Credential credential = authorize();
-        return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+    	if(sheet == null) {
+	        Credential credential = authorize();
+	        return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+	                .setApplicationName(APPLICATION_NAME)
+	                .build();
+    	}
+    	return sheet;
     }
     
+    private  List<List<Object>> getRangeValues(Sheets service , String range) throws IOException {
+        ValueRange response = service.spreadsheets().values()
+                .get(spreadSheetId, range)
+                .execute();
+            List<List<Object>> values = response.getValues();
+            if(values == null) {
+            	values = new ArrayList<List<Object>>();
+            }
+            return values;
+    }
     
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
-        String writeRange = sheetName+"!A2:E";
+        String readRange = sheetName+"!A2:E";
+        
+        List<List<Object>> values = getRangeValues(service, readRange);
+        long lastRow = values.size()+2;
+        String writeRange = "sheetName!A"+lastRow+":E";
 
-        List<List<Object>> writeData = new ArrayList<List<Object>>();
-        for (Content someData: webHook.getChanges()) {
-            List<Object> dataRow = new ArrayList<>();
-            dataRow.add(someData);
-            writeData.add(dataRow);
-        }
+        List<List<Object>> rowList = new ArrayList<List<Object>>();
+        List<Object> colList = new ArrayList<Object>();
+        
+        List<Content> changes = webHook.getChanges();
+        Content content = changes.get(0);
+        Content content2 = changes.get(1);
+        
+        Date updateDate = new Date(content.getNewValues().getUpdatedAt());
+        
+        colList.add(content.getNewValues().getStoryId());
+        colList.add(content2.getNewValues().getName());
+        colList.add(webHook.getPerformedBy().getName());
+        colList.add(content2.getNewValues().getDescription());
+        colList.add(webHook.getMessage());
+        colList.add(DateTool.getDateDMY(updateDate));
+        
+        
 
-        ValueRange vr = new ValueRange().setValues(writeData).setMajorDimension("ROWS");
+        ValueRange vr = new ValueRange().setValues(rowList).setMajorDimension("ROWS");
         service.spreadsheets().values()
                 .update(spreadSheetId, writeRange, vr)
                 .setValueInputOption("RAW")
                 .execute();
     }
     
-//    public static void main(String[] args) throws IOException {
-//        // Build a new authorized API client service.
-//        Sheets service = getSheetsService();
-//
-//        // Prints the names and majors of students in a sample spreadsheet:
-//        // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-//        String spreadsheetId = "1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI";
-//        String range = "TestSheet!A2:E";
-//        ValueRange response = service.spreadsheets().values()
-//            .get(spreadsheetId, range)
-//            .execute();
-//        List<List<Object>> values = response.getValues();
-//        if (values == null || values.size() == 0) {
-//            System.out.println("No data found.");
-//        } else {
-//          System.out.println("Name, Major");
-//          for (List row : values) {
-//            // Print columns A and E, which correspond to indices 0 and 4.
-//            System.out.printf("%s, %s\n", row.get(0), row.get(4));
-//          }
-//        }
-//    }
+    public static void main(String[] args) throws IOException {
+        // Build a new authorized API client service.
+    	SheetService ss = new SheetService();
+        Sheets service = ss.getSheetsService();
+
+        // Prints the names and majors of students in a sample spreadsheet:
+        // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+        String spreadsheetId = "1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI";
+        String range = "TestSheet!A2:E";
+        ValueRange response = service.spreadsheets().values()
+            .get(spreadsheetId, range)
+            .execute();
+        List<List<Object>> values = response.getValues() == null ? new ArrayList<List<Object>>() : response.getValues() ;
+        int lastRow = values.size()+2;
+        range = "TestSheet!A"+lastRow+":E";
+        
+        List<List<Object>> dataList = new ArrayList<List<Object>>();
+        List<Object> colList = new ArrayList<Object>();
+        colList.add("tes1");
+        colList.add("tes2");
+        colList.add("tes3");
+        colList.add("tes4");
+        colList.add("tes5");
+        dataList.add(colList);
+        
+        ValueRange vr = new ValueRange().setValues(dataList).setMajorDimension("ROWS");
+        service.spreadsheets().values()
+                .update(spreadsheetId, range, vr)
+                .setValueInputOption("RAW")
+                .execute();
+    }
 
 }
