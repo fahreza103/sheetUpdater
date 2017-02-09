@@ -37,9 +37,10 @@ public class SheetUpdaterController {
 	}
 	
 	@RequestMapping(value = "/webHookListener")
-	public String webHookListener (@RequestBody String json) {
+	public String webHookListener (@RequestBody String json) throws IOException {
 		log.info("JSON String : "+json);
 		WebHook webHook = jsonService.convertToObject(json);
+		sheetService.addStory(webHook);
 		return json;
 	}
 	
