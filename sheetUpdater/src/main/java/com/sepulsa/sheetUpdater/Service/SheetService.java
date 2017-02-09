@@ -55,7 +55,7 @@ public class SheetService {
     @Value("${server.port}")
     private String appPort;
     
-    @Value("${1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI}")
+    @Value("${spreadsheet.id}")
     private String spreadSheetId;
     
     @Value("${spreadsheet.sheet.name}")
