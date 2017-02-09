@@ -163,14 +163,22 @@ public class SheetService {
         
         List<Content> changes = webHook.getChanges();
         Content content = changes.get(0);
-        Content content2 = changes.get(1);
+        
+        List<Content> primaryResources = webHook.getPrimaryResources();
+        Content primaryResource = primaryResources.get(0);
+        
+        // This object has values if the story has activity add, if no activity, this is null
+        // The main story placed the last of the list, the activity that inside the story place in the first
+        if(changes.size() > 1) {
+        	content = changes.get(changes.size()-1);
+        }
         
         Date updateDate = new Date(content.getNewValues().getUpdatedAt());
         
         colList.add(StringTool.replaceEmpty(content.getNewValues().getStoryId(),"-"));
-        colList.add(StringTool.replaceEmpty(content2.getNewValues().getName(),"-"));
+        colList.add(StringTool.replaceEmpty(primaryResource.getName(),"-"));
         colList.add(StringTool.replaceEmpty(webHook.getPerformedBy().getName(),"-"));
-        colList.add(StringTool.replaceEmpty(content2.getNewValues().getDescription(),"-"));
+        colList.add(StringTool.replaceEmpty(content.getNewValues().getDescription(),"-"));
         colList.add(StringTool.replaceEmpty(webHook.getMessage(),"-"));
         colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(updateDate),"-"));
         log.info("write row :"+colList);
