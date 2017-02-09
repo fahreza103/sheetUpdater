@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.sepulsa.sheetUpdater.Object.WebHook;
+import com.sepulsa.sheetUpdater.Service.JsonService;
 import com.sepulsa.sheetUpdater.Service.SheetService;
 
 @RestController
@@ -25,6 +27,8 @@ public class SheetUpdaterController {
 	
 	@Autowired
 	private SheetService sheetService;
+	@Autowired
+	private JsonService jsonService;
 	
 	private Sheets sheet;
 	
@@ -34,9 +38,10 @@ public class SheetUpdaterController {
 	}
 	
 	@RequestMapping(value = "/webHookListener")
-	public String webHookListener (@RequestBody String activity) {
-		log.info("JSON String : "+activity);
-		return activity;
+	public String webHookListener (@RequestBody String json) {
+		log.info("JSON String : "+json);
+		WebHook webHook = jsonService.convertToObject(json);
+		return json;
 	}
 	
 	
