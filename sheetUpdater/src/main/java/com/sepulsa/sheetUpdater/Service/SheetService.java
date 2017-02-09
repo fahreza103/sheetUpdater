@@ -29,6 +29,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.Object.Content;
 import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.util.DateTool;
+import com.sepulsa.sheetUpdater.util.StringTool;
 
 @Component
 public class SheetService {
@@ -166,12 +167,12 @@ public class SheetService {
         
         Date updateDate = new Date(content.getNewValues().getUpdatedAt());
         
-        colList.add(content.getNewValues().getStoryId());
-        colList.add(content2.getNewValues().getName());
-        colList.add(webHook.getPerformedBy().getName());
-        colList.add(content2.getNewValues().getDescription());
-        colList.add(webHook.getMessage());
-        colList.add(DateTool.getDateDMY(updateDate));
+        colList.add(StringTool.replaceEmpty(content.getNewValues().getStoryId(),"-"));
+        colList.add(StringTool.replaceEmpty(content2.getNewValues().getName(),"-"));
+        colList.add(StringTool.replaceEmpty(webHook.getPerformedBy().getName(),"-"));
+        colList.add(StringTool.replaceEmpty(content2.getNewValues().getDescription(),"-"));
+        colList.add(StringTool.replaceEmpty(webHook.getMessage(),"-"));
+        colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(updateDate),"-"));
         log.info("write row :"+colList);
         
         rowList.add(colList);
