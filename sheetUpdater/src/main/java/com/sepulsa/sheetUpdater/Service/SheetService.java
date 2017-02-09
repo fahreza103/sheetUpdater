@@ -154,7 +154,7 @@ public class SheetService {
         
         List<List<Object>> values = getRangeValues(service, readRange);
         long lastRow = values.size()+2;
-        String writeRange = "sheetName!A"+lastRow+":E";
+        String writeRange = sheetName+"!A"+lastRow+":E";
 
         List<List<Object>> rowList = new ArrayList<List<Object>>();
         List<Object> colList = new ArrayList<Object>();
