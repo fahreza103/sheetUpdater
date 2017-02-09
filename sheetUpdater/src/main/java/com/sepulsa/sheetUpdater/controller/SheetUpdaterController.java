@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +22,7 @@ import com.sepulsa.sheetUpdater.Service.SheetService;
 
 @RestController
 @EnableAutoConfiguration
+@EnableOAuth2Sso
 public class SheetUpdaterController {
 
 	Logger log = Logger.getLogger(SheetUpdaterController.class);
