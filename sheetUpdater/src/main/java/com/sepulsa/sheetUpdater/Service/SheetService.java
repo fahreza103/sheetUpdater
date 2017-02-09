@@ -155,7 +155,8 @@ public class SheetService {
         List<List<Object>> values = getRangeValues(service, readRange);
         long lastRow = values.size()+2;
         String writeRange = sheetName+"!A"+lastRow+":E";
-
+        log.info("write range" + writeRange);
+        
         List<List<Object>> rowList = new ArrayList<List<Object>>();
         List<Object> colList = new ArrayList<Object>();
         
@@ -171,8 +172,9 @@ public class SheetService {
         colList.add(content2.getNewValues().getDescription());
         colList.add(webHook.getMessage());
         colList.add(DateTool.getDateDMY(updateDate));
+        log.info("write row :"+colList);
         
-        
+        rowList.add(colList);
 
         ValueRange vr = new ValueRange().setValues(rowList).setMajorDimension("ROWS");
         service.spreadsheets().values()
