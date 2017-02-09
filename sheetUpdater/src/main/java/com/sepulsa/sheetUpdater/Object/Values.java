@@ -1,6 +1,7 @@
 package com.sepulsa.sheetUpdater.Object;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,6 +34,41 @@ public class Values implements Serializable {
 	private String beforeId;
 	@JsonProperty("after_id")
 	private String afterId;
+	@JsonProperty("current_state")
+	private String currentState;
+	@JsonProperty("owned_by_id")
+	private String ownedById;
+	@JsonProperty("owner_ids")
+	private List<String> ownerIds;
+	@JsonProperty("complete")
+	private String complete;
+	@JsonProperty("filename")
+	private String fileName;
+	@JsonProperty("uploader_id")
+	private String uploaderId;
+	@JsonProperty("thumbnailable")
+	private String thumbnailable;
+	@JsonProperty("size")
+	private long size;
+	@JsonProperty("download_url")
+	private String downloadUrl;
+	@JsonProperty("content_type")
+	private String contentType;
+	@JsonProperty("uploaded")
+	private String uploaded;
+	@JsonProperty("big_url")
+	private String bigUrl;
+	@JsonProperty("thumbnail_url")
+	private String thumbnailUrl;
+	@JsonProperty("file_attachment_ids")
+	private List<String> fileAttachementIds;
+	@JsonProperty("google_attachment_ids")
+	private List<String> googleAttachementIds;
+	@JsonProperty("file_attachments")
+	private List<String> fileAttachements;
+	@JsonProperty("google_attachments")
+	private List<String> googleAttachments;
+	
 	
 	public Counts getCounts() {
 		return counts;
@@ -57,6 +93,150 @@ public class Values implements Serializable {
 	}
 	public void setUpdatedAt(long updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getStoryId() {
+		return storyId;
+	}
+	public void setStoryId(String storyId) {
+		this.storyId = storyId;
+	}
+	public String getText() {
+		return text;
+	}
+	public void setText(String text) {
+		this.text = text;
+	}
+	public String getPersonId() {
+		return personId;
+	}
+	public void setPersonId(String personId) {
+		this.personId = personId;
+	}
+	public long getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
+	}
+	public String getBeforeId() {
+		return beforeId;
+	}
+	public void setBeforeId(String beforeId) {
+		this.beforeId = beforeId;
+	}
+	public String getAfterId() {
+		return afterId;
+	}
+	public void setAfterId(String afterId) {
+		this.afterId = afterId;
+	}
+	public String getCurrentState() {
+		return currentState;
+	}
+	public void setCurrentState(String currentState) {
+		this.currentState = currentState;
+	}
+	public String getOwnedById() {
+		return ownedById;
+	}
+	public void setOwnedById(String ownedById) {
+		this.ownedById = ownedById;
+	}
+	public List<String> getOwnerIds() {
+		return ownerIds;
+	}
+	public void setOwnerIds(List<String> ownerIds) {
+		this.ownerIds = ownerIds;
+	}
+	public String getComplete() {
+		return complete;
+	}
+	public void setComplete(String complete) {
+		this.complete = complete;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public String getUploaderId() {
+		return uploaderId;
+	}
+	public void setUploaderId(String uploaderId) {
+		this.uploaderId = uploaderId;
+	}
+	public String getThumbnailable() {
+		return thumbnailable;
+	}
+	public void setThumbnailable(String thumbnailable) {
+		this.thumbnailable = thumbnailable;
+	}
+	public long getSize() {
+		return size;
+	}
+	public void setSize(long size) {
+		this.size = size;
+	}
+	public String getDownloadUrl() {
+		return downloadUrl;
+	}
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
+	}
+	public String getContentType() {
+		return contentType;
+	}
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+	public String getUploaded() {
+		return uploaded;
+	}
+	public void setUploaded(String uploaded) {
+		this.uploaded = uploaded;
+	}
+	public String getBigUrl() {
+		return bigUrl;
+	}
+	public void setBigUrl(String bigUrl) {
+		this.bigUrl = bigUrl;
+	}
+	public String getThumbnailUrl() {
+		return thumbnailUrl;
+	}
+	public void setThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
+	}
+	public List<String> getFileAttachementIds() {
+		return fileAttachementIds;
+	}
+	public void setFileAttachementIds(List<String> fileAttachementIds) {
+		this.fileAttachementIds = fileAttachementIds;
+	}
+	public List<String> getGoogleAttachementIds() {
+		return googleAttachementIds;
+	}
+	public void setGoogleAttachementIds(List<String> googleAttachementIds) {
+		this.googleAttachementIds = googleAttachementIds;
+	}
+	public List<String> getFileAttachements() {
+		return fileAttachements;
+	}
+	public void setFileAttachements(List<String> fileAttachements) {
+		this.fileAttachements = fileAttachements;
+	}
+	public List<String> getGoogleAttachments() {
+		return googleAttachments;
+	}
+	public void setGoogleAttachments(List<String> googleAttachments) {
+		this.googleAttachments = googleAttachments;
 	}
 	
 	
