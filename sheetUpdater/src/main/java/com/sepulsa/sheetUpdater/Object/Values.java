@@ -50,6 +50,8 @@ public class Values implements Serializable {
 	private String thumbnailable;
 	@JsonProperty("size")
 	private long size;
+	@JsonProperty("description")
+	private String description;
 	@JsonProperty("download_url")
 	private String downloadUrl;
 	@JsonProperty("content_type")
@@ -60,6 +62,14 @@ public class Values implements Serializable {
 	private String bigUrl;
 	@JsonProperty("thumbnail_url")
 	private String thumbnailUrl;
+	@JsonProperty("position")
+	private long position;
+	@JsonProperty("label_ids")
+	private List<String> labelIds;
+	@JsonProperty("labels")
+	private List<String> labels;
+	@JsonProperty("follower_ids")
+	private List<String> followerIds;
 	@JsonProperty("file_attachment_ids")
 	private List<String> fileAttachementIds;
 	@JsonProperty("google_attachment_ids")
@@ -237,6 +247,36 @@ public class Values implements Serializable {
 	}
 	public void setGoogleAttachments(List<String> googleAttachments) {
 		this.googleAttachments = googleAttachments;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public long getPosition() {
+		return position;
+	}
+	public void setPosition(long position) {
+		this.position = position;
+	}
+	public List<String> getLabelIds() {
+		return labelIds;
+	}
+	public void setLabelIds(List<String> labelIds) {
+		this.labelIds = labelIds;
+	}
+	public List<String> getLabels() {
+		return labels;
+	}
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
+	}
+	public List<String> getFollowerIds() {
+		return followerIds;
+	}
+	public void setFollowerIds(List<String> followerIds) {
+		this.followerIds = followerIds;
 	}
 	
 	
