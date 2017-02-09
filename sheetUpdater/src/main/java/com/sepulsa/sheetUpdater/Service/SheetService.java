@@ -150,11 +150,11 @@ public class SheetService {
     
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
-        String readRange = sheetName+"!A2:E";
+        String readRange = sheetName+"!A2:F";
         
         List<List<Object>> values = getRangeValues(service, readRange);
         long lastRow = values.size()+2;
-        String writeRange = sheetName+"!A"+lastRow+":E";
+        String writeRange = sheetName+"!A"+lastRow+":F";
         log.info("write range" + writeRange);
         
         List<List<Object>> rowList = new ArrayList<List<Object>>();
