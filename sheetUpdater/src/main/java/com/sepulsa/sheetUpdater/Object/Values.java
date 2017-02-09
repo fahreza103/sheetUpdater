@@ -29,6 +29,10 @@ public class Values implements Serializable {
 	private long createdAt;
 	@JsonProperty("updated_at")
 	private long updatedAt;
+	@JsonProperty("before_id")
+	private String beforeId;
+	@JsonProperty("after_id")
+	private String afterId;
 	
 	public Counts getCounts() {
 		return counts;
