@@ -3,6 +3,7 @@ package com.sepulsa.sheetUpdater.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,6 +23,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.ValueRange;
+import com.sepulsa.sheetUpdater.Object.Content;
+import com.sepulsa.sheetUpdater.Object.WebHook;
 
 @Component
 public class SheetService {
@@ -49,6 +53,12 @@ public class SheetService {
     
     @Value("${server.port}")
     private String appPort;
+    
+    @Value("1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI")
+    private String spreadSheetId;
+    
+    @Value("spreadsheet.sheet.name")
+    private String sheetName;
 
     /** Global instance of the scopes required by this quickstart.
      *
@@ -117,6 +127,25 @@ public class SheetService {
         return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build();
+    }
+    
+    
+    public void addStory(WebHook webHook) throws IOException {
+    	Sheets service = getSheetsService();
+        String writeRange = sheetName+"!A2:E";
+
+        List<List<Object>> writeData = new ArrayList<List<Object>>();
+        for (Content someData: webHook.getChanges()) {
+            List<Object> dataRow = new ArrayList<>();
+            dataRow.add(someData);
+            writeData.add(dataRow);
+        }
+
+        ValueRange vr = new ValueRange().setValues(writeData).setMajorDimension("ROWS");
+        service.spreadsheets().values()
+                .update(spreadSheetId, writeRange, vr)
+                .setValueInputOption("RAW")
+                .execute();
     }
     
 //    public static void main(String[] args) throws IOException {
