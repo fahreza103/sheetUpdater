@@ -54,10 +54,10 @@ public class SheetService {
     @Value("${server.port}")
     private String appPort;
     
-    @Value("1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI")
+    @Value("${1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI}")
     private String spreadSheetId;
     
-    @Value("spreadsheet.sheet.name")
+    @Value("${spreadsheet.sheet.name}")
     private String sheetName;
 
     /** Global instance of the scopes required by this quickstart.
