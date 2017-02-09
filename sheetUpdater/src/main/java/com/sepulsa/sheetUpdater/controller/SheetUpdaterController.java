@@ -48,7 +48,9 @@ public class SheetUpdaterController {
 	@RequestMapping("/updateSheet")
 	public String updateSheet (HttpServletRequest request) throws IOException {
         // Build a new authorized API client service.
-		sheet = sheetService.getSheetsService();
+		if(sheet == null) {
+			sheet = sheetService.getSheetsService();
+		}
         String spreadsheetId = "1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI";
         String range = "TestSheet!A2:E";
         ValueRange response = sheet.spreadsheets().values()
