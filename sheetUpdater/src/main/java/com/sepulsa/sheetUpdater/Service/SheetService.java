@@ -238,14 +238,14 @@ public class SheetService {
     	// Update the values
     	colValues.set(1, storyName);
     	if(description != null) {
-    		colValues.set(2, description);
+    		colValues.set(3, description);
     	}
     	if(message != null) {
-    		colValues.set(3, message);
+    		colValues.set(4, message);
     	}
     	if(updateDateStr != null) {
     		Date updateDate = new Date(storyChanges.getNewValues().getUpdatedAt());
-    		colValues.set(4,DateTool.getDateDMY(updateDate));
+    		colValues.set(5,DateTool.getDateDMY(updateDate));
     	}
     	log.info("NEW VALUES : "+colValues);
     	
