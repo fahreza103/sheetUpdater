@@ -36,6 +36,8 @@ public class Values implements Serializable {
 	private String afterId;
 	@JsonProperty("current_state")
 	private String currentState;
+	@JsonProperty("requested_by_id")
+	private String requestedById;
 	@JsonProperty("owned_by_id")
 	private String ownedById;
 	@JsonProperty("owner_ids")
@@ -277,6 +279,12 @@ public class Values implements Serializable {
 	}
 	public void setFollowerIds(List<String> followerIds) {
 		this.followerIds = followerIds;
+	}
+	public String getRequestedById() {
+		return requestedById;
+	}
+	public void setRequestedById(String requestedById) {
+		this.requestedById = requestedById;
 	}
 	
 	

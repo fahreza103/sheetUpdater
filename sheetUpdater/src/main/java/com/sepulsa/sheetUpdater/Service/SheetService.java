@@ -166,6 +166,18 @@ public class SheetService {
     	return valuesMap;
     }
     
+    private Content getStoryChanges(List<Content> changes) {
+        Content content = changes.get(0);
+        
+        // This object has values if the story has activity add, if no activity, this is null
+        // The main story placed the last of the list, the activity (comment,file attachment) that inside the story place in the first
+        if(changes.size() > 1) {
+        	content = changes.get(changes.size()-1);
+        }
+        
+        return content;
+    }
+    
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
@@ -179,16 +191,12 @@ public class SheetService {
         List<Object> colList = new ArrayList<Object>();
         
         List<Content> changes = webHook.getChanges();
-        Content content = changes.get(0);
+        Content content = getStoryChanges(changes);
         
         List<Content> primaryResources = webHook.getPrimaryResources();
         Content primaryResource = primaryResources.get(0);
         
-        // This object has values if the story has activity add, if no activity, this is null
-        // The main story placed the last of the list, the activity (comment,file attachment) that inside the story place in the first
-        if(changes.size() > 1) {
-        	content = changes.get(changes.size()-1);
-        }
+
         
         Date updateDate = new Date(content.getNewValues().getUpdatedAt());
         
@@ -214,6 +222,10 @@ public class SheetService {
         String readRange = sheetName+"!A2:F";
     	Map<String,SheetRowValues> rowValuesMap = getRangeValuesMap(service, readRange);
     	
+    	Content storyChanges = getStoryChanges(webHook.getChanges());
+        
+    	String storyName= webHook.getPrimaryResources().get(0).getName();
+    	//String description =
     	
     }
     
