@@ -29,8 +29,8 @@ public class JsonService {
 	public WebHook convertToObject (String json) {
 		log.debug("Convert json to object, json string :"+json);
 		try {
-			// Replace null values with "-", it means something changed to empty
-			json = json.replaceAll("null", "-");
+			// Replace null values with empty String, it means something changed to empty
+			json = json.replaceAll("null", "\"\"");
 			
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
