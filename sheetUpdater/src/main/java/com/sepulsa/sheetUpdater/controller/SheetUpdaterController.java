@@ -24,6 +24,10 @@ public class SheetUpdaterController {
 
 	Logger log = Logger.getLogger(SheetUpdaterController.class);
 	
+	private static final String ACTIVITY_CREATE = "story_create_activity";
+	private static final String ACTIVITY_MOVE = "story_move_activity";
+	private static final String ACTIVITY_UPDATE = "story_update_activity";
+	
 	@Autowired
 	private SheetService sheetService;
 	@Autowired
@@ -40,7 +44,18 @@ public class SheetUpdaterController {
 	public String webHookListener (@RequestBody String json) throws IOException {
 		log.info("JSON String : "+json);
 		WebHook webHook = jsonService.convertToObject(json);
-		sheetService.addStory(webHook);
+		
+		// Get kind (activity by user in pivotal)
+		String kind = webHook.getKind();
+		
+		if(ACTIVITY_CREATE.equals(kind)) {
+			sheetService.addStory(webHook);
+		} else if (ACTIVITY_MOVE.equals(kind)) {
+			
+		} else if (ACTIVITY_UPDATE.equals(kind)) {
+			
+		}
+	  
 		return json;
 	}
 	

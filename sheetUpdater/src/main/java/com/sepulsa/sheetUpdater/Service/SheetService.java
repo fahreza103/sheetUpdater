@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +29,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.Object.Content;
+import com.sepulsa.sheetUpdater.Object.SheetRowValues;
 import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.util.DateTool;
 import com.sepulsa.sheetUpdater.util.StringTool;
@@ -149,6 +152,20 @@ public class SheetService {
             return values;
     }
     
+    private Map<String,SheetRowValues> getRangeValuesMap(Sheets service , String range) throws IOException {
+    	Map<String,SheetRowValues> valuesMap = new HashMap<String,SheetRowValues>();
+    	List<List<Object>> rowList = getRangeValues( service ,  range);
+    	int rowNum = 2;
+    	for(List<Object> cols : rowList) {
+    		SheetRowValues rowVal = new SheetRowValues();
+    		rowVal.setColListValues(cols);
+    		rowVal.setRowNum(rowNum);
+    		valuesMap.put((String) cols.get(0), rowVal);
+    		rowNum++;
+    	}
+    	return valuesMap;
+    }
+    
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
@@ -168,7 +185,7 @@ public class SheetService {
         Content primaryResource = primaryResources.get(0);
         
         // This object has values if the story has activity add, if no activity, this is null
-        // The main story placed the last of the list, the activity that inside the story place in the first
+        // The main story placed the last of the list, the activity (comment,file attachment) that inside the story place in the first
         if(changes.size() > 1) {
         	content = changes.get(changes.size()-1);
         }
@@ -190,6 +207,14 @@ public class SheetService {
                 .update(spreadSheetId, writeRange, vr)
                 .setValueInputOption("RAW")
                 .execute();
+    }
+    
+    public void updateStory(WebHook webHook) throws IOException {
+    	Sheets service = getSheetsService();
+        String readRange = sheetName+"!A2:F";
+    	Map<String,SheetRowValues> rowValuesMap = getRangeValuesMap(service, readRange);
+    	
+    	
     }
     
     public static void main(String[] args) throws IOException {
