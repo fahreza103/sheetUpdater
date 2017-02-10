@@ -234,8 +234,9 @@ public class SheetService {
     	SheetRowValues updatedStory = rowValuesMap.get(storyId);
     	// Get the old values
     	List<Object> colValues = updatedStory.getColListValues();
+    	log.info("OLD VALUES : "+colValues);
     	// Update the values
-    	colValues.set(0, storyName);
+    	colValues.set(1, storyName);
     	if(description != null) {
     		colValues.set(2, description);
     	}
@@ -246,6 +247,7 @@ public class SheetService {
     		Date updateDate = new Date(storyChanges.getNewValues().getUpdatedAt());
     		colValues.set(4,DateTool.getDateDMY(updateDate));
     	}
+    	log.info("NEW VALUES : "+colValues);
     	
     	String writeRange = sheetName+"!A"+ updatedStory.getRowNum() +":F";
     	List<List<Object>> dataRow = new ArrayList<List<Object>>();
