@@ -3,7 +3,6 @@ package com.sepulsa.sheetUpdater.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -58,7 +57,9 @@ public class SheetService {
     
     private Sheets sheet;
     
-    private final int DEFAULT_PORT = 8181;
+    private static final int DEFAULT_PORT = 8181;
+    
+    private static final String KIND_STORY = "story";
     
     @Value("${server.port}")
     private String appPort;
@@ -166,16 +167,14 @@ public class SheetService {
     	return valuesMap;
     }
     
-    private Content getStoryChanges(List<Content> changes) {
-        Content content = changes.get(0);
-        
-        // This object has values if the story has activity add, if no activity, this is null
-        // The main story placed the last of the list, the activity (comment,file attachment) that inside the story place in the first
-        if(changes.size() > 1) {
-        	content = changes.get(changes.size()-1);
-        }
-        
-        return content;
+    private Content getStoryChanges(List<Content> changes) {      
+        // search changes with kind story
+        for(Content change : changes) {
+        	if(KIND_STORY.equals(change.getKind())) {
+        		return change;
+        	}
+        }        
+        return null;
     }
     
     public void addStory(WebHook webHook) throws IOException {
@@ -196,16 +195,14 @@ public class SheetService {
         List<Content> primaryResources = webHook.getPrimaryResources();
         Content primaryResource = primaryResources.get(0);
         
-
-        
-        Date updateDate = new Date(content.getNewValues().getUpdatedAt());
+        Date insertDate = new Date(webHook.getOccuredAt());
         
         colList.add(StringTool.replaceEmpty(primaryResource.getId(),"-"));
         colList.add(StringTool.replaceEmpty(primaryResource.getName(),"-"));
         colList.add(StringTool.replaceEmpty(webHook.getPerformedBy().getName(),"-"));
         colList.add(StringTool.replaceEmpty(content.getNewValues().getDescription(),"-"));
         colList.add(StringTool.replaceEmpty(webHook.getMessage(),"-"));
-        colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(updateDate),"-"));
+        colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
         log.info("write row :"+colList);
         
         rowList.add(colList);
