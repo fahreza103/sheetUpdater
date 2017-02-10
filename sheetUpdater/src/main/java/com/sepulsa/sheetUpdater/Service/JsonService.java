@@ -30,7 +30,7 @@ public class JsonService {
 		log.debug("Convert json to object, json string :"+json);
 		try {
 			// Replace null values with empty string, it means something changed to empty
-			json = json.replace("null", "");
+			json = json.replaceAll("null", "");
 			
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
