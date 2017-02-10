@@ -199,7 +199,7 @@ public class SheetService {
         
         colList.add(StringTool.replaceEmpty(primaryResource.getId(),"-"));
         colList.add(StringTool.replaceEmpty(primaryResource.getName(),"-"));
-        colList.add(StringTool.replaceEmpty(webHook.getPerformedBy().getName(),"-"));
+        colList.add(StringTool.replaceEmpty(content.getNewValues().getCurrentState(),"-"));
         colList.add(StringTool.replaceEmpty(content.getNewValues().getDescription(),"-"));
         colList.add(StringTool.replaceEmpty(webHook.getMessage(),"-"));
         colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
@@ -223,6 +223,7 @@ public class SheetService {
  
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	String storyName= webHook.getPrimaryResources().get(0).getName();
+    	String currentState = storyChanges.getNewValues().getCurrentState();
     	String description = storyChanges.getNewValues().getDescription();
     	String message = webHook.getMessage();
     	Long updateDateStr =  storyChanges.getNewValues().getUpdatedAt(); 
@@ -234,6 +235,9 @@ public class SheetService {
     	log.info("OLD VALUES : "+colValues);
     	// Update the values
     	colValues.set(1, storyName);
+    	if(currentState != null) {
+    		colValues.set(2, currentState);
+    	}
     	if(description != null) {
     		colValues.set(3, description);
     	}
