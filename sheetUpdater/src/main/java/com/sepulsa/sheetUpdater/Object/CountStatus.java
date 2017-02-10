@@ -8,70 +8,70 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class CountStatus {
 	
 	@JsonProperty("accepted")
-	private int accepted;
+	private Long accepted;
 	@JsonProperty("started")
-	private int started;
+	private Long started;
 	@JsonProperty("finished")
-	private int finished;
+	private Long finished;
 	@JsonProperty("unstarted")
-	private int unstarted;
+	private Long unstarted;
 	@JsonProperty("planned")
-	private int planned;
+	private Long planned;
 	@JsonProperty("delivered")
-	private int delivered;
+	private Long delivered;
 	@JsonProperty("unscheduled")
-	private int unsceduled;
+	private Long unsceduled;
 	@JsonProperty("rejected")
-	private int rejected;
+	private Long rejected;
 	@JsonProperty("kind")
 	private String kind;
 	
-	public int getAccepted() {
+	public Long getAccepted() {
 		return accepted;
 	}
-	public void setAccepted(int accepted) {
+	public void setAccepted(Long accepted) {
 		this.accepted = accepted;
 	}
-	public int getStarted() {
+	public Long getStarted() {
 		return started;
 	}
-	public void setStarted(int started) {
+	public void setStarted(Long started) {
 		this.started = started;
 	}
-	public int getFinished() {
+	public Long getFinished() {
 		return finished;
 	}
-	public void setFinished(int finished) {
+	public void setFinished(Long finished) {
 		this.finished = finished;
 	}
-	public int getUnstarted() {
+	public Long getUnstarted() {
 		return unstarted;
 	}
-	public void setUnstarted(int unstarted) {
+	public void setUnstarted(Long unstarted) {
 		this.unstarted = unstarted;
 	}
-	public int getPlanned() {
+	public Long getPlanned() {
 		return planned;
 	}
-	public void setPlanned(int planned) {
+	public void setPlanned(Long planned) {
 		this.planned = planned;
 	}
-	public int getDelivered() {
+	public Long getDelivered() {
 		return delivered;
 	}
-	public void setDelivered(int delivered) {
+	public void setDelivered(Long delivered) {
 		this.delivered = delivered;
 	}
-	public int getUnsceduled() {
+	public Long getUnsceduled() {
 		return unsceduled;
 	}
-	public void setUnsceduled(int unsceduled) {
+	public void setUnsceduled(Long unsceduled) {
 		this.unsceduled = unsceduled;
 	}
-	public int getRejected() {
+	public Long getRejected() {
 		return rejected;
 	}
-	public void setRejected(int rejected) {
+	public void setRejected(Long rejected) {
 		this.rejected = rejected;
 	}
 	public String getKind() {

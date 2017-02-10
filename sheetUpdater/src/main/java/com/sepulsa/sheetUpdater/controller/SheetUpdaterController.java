@@ -53,7 +53,7 @@ public class SheetUpdaterController {
 		} else if (ACTIVITY_MOVE.equals(kind)) {
 			
 		} else if (ACTIVITY_UPDATE.equals(kind)) {
-			
+			sheetService.updateStory(webHook);
 		}
 	  
 		return json;

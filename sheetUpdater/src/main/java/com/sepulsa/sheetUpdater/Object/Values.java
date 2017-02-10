@@ -25,11 +25,11 @@ public class Values implements Serializable {
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("estimate")
-	private long estimate;
+	private Long estimate;
 	@JsonProperty("created_at")
-	private long createdAt;
+	private Long createdAt;
 	@JsonProperty("updated_at")
-	private long updatedAt;
+	private Long updatedAt;
 	@JsonProperty("before_id")
 	private String beforeId;
 	@JsonProperty("after_id")
@@ -51,7 +51,7 @@ public class Values implements Serializable {
 	@JsonProperty("thumbnailable")
 	private String thumbnailable;
 	@JsonProperty("size")
-	private long size;
+	private Long size;
 	@JsonProperty("description")
 	private String description;
 	@JsonProperty("download_url")
@@ -65,7 +65,7 @@ public class Values implements Serializable {
 	@JsonProperty("thumbnail_url")
 	private String thumbnailUrl;
 	@JsonProperty("position")
-	private long position;
+	private Long position;
 	@JsonProperty("label_ids")
 	private List<String> labelIds;
 	@JsonProperty("labels")
@@ -94,16 +94,16 @@ public class Values implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public long getEstimate() {
+	public Long getEstimate() {
 		return estimate;
 	}
-	public void setEstimate(long estimate) {
+	public void setEstimate(Long estimate) {
 		this.estimate = estimate;
 	}
-	public long getUpdatedAt() {
+	public Long getUpdatedAt() {
 		return updatedAt;
 	}
-	public void setUpdatedAt(long updatedAt) {
+	public void setUpdatedAt(Long updatedAt) {
 		this.updatedAt = updatedAt;
 	}
 	public String getId() {
@@ -130,10 +130,10 @@ public class Values implements Serializable {
 	public void setPersonId(String personId) {
 		this.personId = personId;
 	}
-	public long getCreatedAt() {
+	public Long getCreatedAt() {
 		return createdAt;
 	}
-	public void setCreatedAt(long createdAt) {
+	public void setCreatedAt(Long createdAt) {
 		this.createdAt = createdAt;
 	}
 	public String getBeforeId() {
@@ -190,10 +190,10 @@ public class Values implements Serializable {
 	public void setThumbnailable(String thumbnailable) {
 		this.thumbnailable = thumbnailable;
 	}
-	public long getSize() {
+	public Long getSize() {
 		return size;
 	}
-	public void setSize(long size) {
+	public void setSize(Long size) {
 		this.size = size;
 	}
 	public String getDownloadUrl() {
@@ -256,10 +256,10 @@ public class Values implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public long getPosition() {
+	public Long getPosition() {
 		return position;
 	}
-	public void setPosition(long position) {
+	public void setPosition(Long position) {
 		this.position = position;
 	}
 	public List<String> getLabelIds() {

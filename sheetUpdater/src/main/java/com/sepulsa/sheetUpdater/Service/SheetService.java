@@ -223,9 +223,39 @@ public class SheetService {
     	Map<String,SheetRowValues> rowValuesMap = getRangeValuesMap(service, readRange);
     	
     	Content storyChanges = getStoryChanges(webHook.getChanges());
-        
+ 
+    	String storyId = webHook.getPrimaryResources().get(0).getId();
     	String storyName= webHook.getPrimaryResources().get(0).getName();
-    	//String description =
+    	String description = storyChanges.getNewValues().getDescription();
+    	String message = webHook.getMessage();
+    	Long updateDateStr =  storyChanges.getNewValues().getUpdatedAt(); 
+    	
+    	// Get story id from map
+    	SheetRowValues updatedStory = rowValuesMap.get(storyId);
+    	// Get the old values
+    	List<Object> colValues = updatedStory.getColListValues();
+    	// Update the values
+    	colValues.set(0, storyName);
+    	if(description != null) {
+    		colValues.set(2, description);
+    	}
+    	if(message != null) {
+    		colValues.set(3, message);
+    	}
+    	if(updateDateStr != null) {
+    		Date updateDate = new Date(storyChanges.getNewValues().getUpdatedAt());
+    		colValues.set(4,DateTool.getDateDMY(updateDate));
+    	}
+    	
+    	String writeRange = sheetName+"!A"+ updatedStory.getRowNum() +":F";
+    	List<List<Object>> dataRow = new ArrayList<List<Object>>();
+    	dataRow.add(colValues);
+    	
+        ValueRange vr = new ValueRange().setValues(dataRow).setMajorDimension("ROWS");
+        service.spreadsheets().values()
+                .update(spreadSheetId, writeRange, vr)
+                .setValueInputOption("RAW")
+                .execute();
     	
     }
     
@@ -243,7 +273,7 @@ public class SheetService {
             .execute();
         List<List<Object>> values = response.getValues() == null ? new ArrayList<List<Object>>() : response.getValues() ;
         int lastRow = values.size()+2;
-        range = "TestSheet!A"+lastRow+":E";
+        range = "TestSheet!A3"+lastRow+":E";
         
         List<List<Object>> dataList = new ArrayList<List<Object>>();
         List<Object> colList = new ArrayList<Object>();
