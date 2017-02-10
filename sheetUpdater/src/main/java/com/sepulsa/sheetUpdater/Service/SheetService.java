@@ -200,7 +200,7 @@ public class SheetService {
         
         Date updateDate = new Date(content.getNewValues().getUpdatedAt());
         
-        colList.add(StringTool.replaceEmpty(content.getNewValues().getStoryId(),"-"));
+        colList.add(StringTool.replaceEmpty(primaryResource.getId(),"-"));
         colList.add(StringTool.replaceEmpty(primaryResource.getName(),"-"));
         colList.add(StringTool.replaceEmpty(webHook.getPerformedBy().getName(),"-"));
         colList.add(StringTool.replaceEmpty(content.getNewValues().getDescription(),"-"));
