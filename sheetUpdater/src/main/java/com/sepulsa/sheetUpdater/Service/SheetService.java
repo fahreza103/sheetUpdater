@@ -181,12 +181,7 @@ public class SheetService {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
         
-        List<List<Object>> values = getRangeValues(service, readRange);
-        long lastRow = values.size()+2;
-        String writeRange = sheetName+"!A"+lastRow+":F";
-        log.info("write range" + writeRange);
-        
-        List<List<Object>> rowList = new ArrayList<List<Object>>();
+        List<List<Object>> writeRange = getRangeValues(service, readRange);
         List<Object> colList = new ArrayList<Object>();
         
         List<Content> changes = webHook.getChanges();
@@ -205,11 +200,11 @@ public class SheetService {
         colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
         log.info("write row :"+colList);
         
-        rowList.add(colList);
+        writeRange.add(0,colList);
 
-        ValueRange vr = new ValueRange().setValues(rowList).setMajorDimension("ROWS");
+        ValueRange vr = new ValueRange().setValues(writeRange).setMajorDimension("ROWS");
         service.spreadsheets().values()
-                .update(spreadSheetId, writeRange, vr)
+                .update(spreadSheetId, readRange, vr)
                 .setValueInputOption("RAW")
                 .execute();
     }
@@ -259,6 +254,10 @@ public class SheetService {
                 .update(spreadSheetId, writeRange, vr)
                 .setValueInputOption("RAW")
                 .execute();
+    	
+    }
+    
+    public void moveStory(WebHook webHook) {
     	
     }
     
