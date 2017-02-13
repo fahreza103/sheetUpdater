@@ -295,6 +295,7 @@ public class SheetService {
     		// Placed after / below afterId
     		rowValues.add(position,rowValue.getColListValues());			
 			// Remove current position
+    		rowNum++;
 			rowValues.remove(rowNum);
     	} else {
     		log.info("No afterId or beforeId defined, do nothing");
