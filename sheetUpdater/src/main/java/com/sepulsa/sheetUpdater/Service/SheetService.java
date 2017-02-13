@@ -296,6 +296,7 @@ public class SheetService {
     		log.info("No afterId or beforeId defined, do nothing");
     	}
     	
+    	writeToSheet(service,readRange,rowValues);
     }
     
     public static void main(String[] args) throws IOException {
