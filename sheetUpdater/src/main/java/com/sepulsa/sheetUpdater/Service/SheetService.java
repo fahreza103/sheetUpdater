@@ -294,8 +294,8 @@ public class SheetService {
 
     		// Placed after / below afterId
     		rowValues.add(position,rowValue.getColListValues());			
-    		// Last row
-    		if(rowNum == rowValues.size()-2) {
+    		// Move up, current position located below the target position
+    		if(rowNum >= position) {
     			rowNum++;
     		}
 			// Remove current position
