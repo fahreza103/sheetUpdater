@@ -184,6 +184,52 @@ public class SheetService {
                 .execute();
     }
     
+    private List<List<Object>> moveStory(WebHook webHook,List<List<Object>> rowValues, Map<String,SheetRowValues> rowValuesMap) {
+    	Content storyChanges = getStoryChanges(webHook.getChanges());
+    	
+    	String storyId = webHook.getPrimaryResources().get(0).getId();
+    	String afterId = storyChanges.getNewValues().getAfterId();
+    	String beforeId = storyChanges.getNewValues().getBeforeId();
+    	SheetRowValues rowValue = rowValuesMap.get(storyId);
+    	int rowNum = rowValue.getRowNum();
+    	
+    	log.info("Story row position : "+rowNum);
+    	// Placed on the top of the list in tracker
+    	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
+    		log.info("Move into first position");
+    		// Placed at the first index
+    		rowValues.add(0,rowValue.getColListValues());
+			// Remove current position
+    		rowNum++;
+			rowValues.remove(rowNum);
+		// Placed on the bottom of the list in tracker
+    	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
+    		log.info("Move into last position");
+    		// Placed at the last index
+    		rowValues.add(rowValue.getColListValues());
+			// Remove current position
+			rowValues.remove(rowNum);
+    	// Placed in the middle, between story
+    	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
+    		log.info("Move after id "+afterId);
+    		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
+    		int position = afterIdStory.getRowNum() + 1;
+
+    		// Placed after / below afterId
+    		rowValues.add(position,rowValue.getColListValues());			
+    		// Move up, current position located below the target position
+    		if(rowNum >= position) {
+    			rowNum++;
+    		}
+			// Remove current position
+			rowValues.remove(rowNum);
+    	} else {
+    		log.info("No afterId or beforeId defined, do nothing");
+    	}
+    	log.debug(rowValues);
+    	return rowValues;
+    }
+    
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
@@ -248,62 +294,27 @@ public class SheetService {
     		colValues.set(5,DateTool.getDateDMY(updateDate));
     	}
     	log.info("NEW VALUES : "+colValues);
-    	
-    	String writeRange = sheetName+"!A"+ updatedStory.getRowNum()+2 +":F";
-    	List<List<Object>> dataRow = new ArrayList<List<Object>>();
-    	dataRow.add(colValues);
-    	
-    	writeToSheet(service,writeRange,dataRow);
+    	// Update the values
+    	updatedStory.setColListValues(colValues);
+    	rowValues.set(updatedStory.getRowNum(), colValues);
+    	rowValuesMap.put(storyId, updatedStory);
+    	// if there is an update to start the project, this story will move to the top
+    	rowValues = moveStory(webHook, rowValues, rowValuesMap);
+    	    	
+    	writeToSheet(service,readRange,rowValues);
+
     	
     }
+    
+
     
     public void moveStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
         List<List<Object>> rowValues = getRangeValues(service, readRange);
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
-    	Content storyChanges = getStoryChanges(webHook.getChanges());
-    	
-    	String storyId = webHook.getPrimaryResources().get(0).getId();
-    	String afterId = storyChanges.getNewValues().getAfterId();
-    	String beforeId = storyChanges.getNewValues().getBeforeId();
-    	SheetRowValues rowValue = rowValuesMap.get(storyId);
-    	int rowNum = rowValue.getRowNum();
-    	
-    	log.info("Story row position : "+rowNum);
-    	// Placed on the top of the list in tracker
-    	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
-    		log.info("Move into first position");
-    		// Placed at the first index
-    		rowValues.add(0,rowValue.getColListValues());
-			// Remove current position
-    		rowNum++;
-			rowValues.remove(rowNum);
-		// Placed on the bottom of the list in tracker
-    	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
-    		log.info("Move into last position");
-    		// Placed at the last index
-    		rowValues.add(rowValue.getColListValues());
-			// Remove current position
-			rowValues.remove(rowNum);
-    	// Placed in the middle, between story
-    	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
-    		log.info("Move after id "+afterId);
-    		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
-    		int position = afterIdStory.getRowNum() + 1;
 
-    		// Placed after / below afterId
-    		rowValues.add(position,rowValue.getColListValues());			
-    		// Move up, current position located below the target position
-    		if(rowNum >= position) {
-    			rowNum++;
-    		}
-			// Remove current position
-			rowValues.remove(rowNum);
-    	} else {
-    		log.info("No afterId or beforeId defined, do nothing");
-    	}
-    	log.info(rowValues);
+    	rowValues = moveStory(webHook, rowValues, rowValuesMap);
     	writeToSheet(service,readRange,rowValues);
     }
     
