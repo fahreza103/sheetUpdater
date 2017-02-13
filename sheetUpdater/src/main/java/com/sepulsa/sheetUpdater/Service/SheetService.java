@@ -277,6 +277,7 @@ public class SheetService {
     		// Placed at the first index
     		rowValues.add(0,rowValue.getColListValues());
 			// Remove current position
+    		rowNum++;
 			rowValues.remove(rowNum);
 		// Placed on the bottom of the list in tracker
     	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
