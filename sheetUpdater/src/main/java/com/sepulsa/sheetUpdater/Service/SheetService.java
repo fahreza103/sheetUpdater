@@ -153,10 +153,9 @@ public class SheetService {
             return values;
     }
     
-    private Map<String,SheetRowValues> getRangeValuesMap(Sheets service , String range) throws IOException {
+    private Map<String,SheetRowValues> convertRowValuesToMap (List<List<Object>> rowList) throws IOException {
     	Map<String,SheetRowValues> valuesMap = new HashMap<String,SheetRowValues>();
-    	List<List<Object>> rowList = getRangeValues( service ,  range);
-    	int rowNum = 2;
+    	int rowNum = 0;
     	for(List<Object> cols : rowList) {
     		SheetRowValues rowVal = new SheetRowValues();
     		rowVal.setColListValues(cols);
@@ -177,11 +176,19 @@ public class SheetService {
         return null;
     }
     
+    private void writeToSheet(Sheets service, String writeRange, List<List<Object>> rowValues) throws IOException {
+        ValueRange vr = new ValueRange().setValues(rowValues).setMajorDimension("ROWS");
+        service.spreadsheets().values()
+                .update(spreadSheetId, writeRange, vr)
+                .setValueInputOption("RAW")
+                .execute();
+    }
+    
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
         
-        List<List<Object>> writeRange = getRangeValues(service, readRange);
+        List<List<Object>> rowList = getRangeValues(service, readRange);
         List<Object> colList = new ArrayList<Object>();
         
         List<Content> changes = webHook.getChanges();
@@ -200,19 +207,16 @@ public class SheetService {
         colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
         log.info("write row :"+colList);
         
-        writeRange.add(0,colList);
+        rowList.add(0,colList);
 
-        ValueRange vr = new ValueRange().setValues(writeRange).setMajorDimension("ROWS");
-        service.spreadsheets().values()
-                .update(spreadSheetId, readRange, vr)
-                .setValueInputOption("RAW")
-                .execute();
+        writeToSheet(service,readRange,rowList);
     }
     
     public void updateStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
-    	Map<String,SheetRowValues> rowValuesMap = getRangeValuesMap(service, readRange);
+        List<List<Object>> rowValues = getRangeValues(service, readRange);
+    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
     	
     	Content storyChanges = getStoryChanges(webHook.getChanges());
  
@@ -245,19 +249,52 @@ public class SheetService {
     	}
     	log.info("NEW VALUES : "+colValues);
     	
-    	String writeRange = sheetName+"!A"+ updatedStory.getRowNum() +":F";
+    	String writeRange = sheetName+"!A"+ updatedStory.getRowNum()+2 +":F";
     	List<List<Object>> dataRow = new ArrayList<List<Object>>();
     	dataRow.add(colValues);
     	
-        ValueRange vr = new ValueRange().setValues(dataRow).setMajorDimension("ROWS");
-        service.spreadsheets().values()
-                .update(spreadSheetId, writeRange, vr)
-                .setValueInputOption("RAW")
-                .execute();
+    	writeToSheet(service,writeRange,dataRow);
     	
     }
     
-    public void moveStory(WebHook webHook) {
+    public void moveStory(WebHook webHook) throws IOException {
+    	Sheets service = getSheetsService();
+        String readRange = sheetName+"!A2:F";
+        List<List<Object>> rowValues = getRangeValues(service, readRange);
+    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+    	Content storyChanges = getStoryChanges(webHook.getChanges());
+    	
+    	String storyId = webHook.getPrimaryResources().get(0).getId();
+    	String afterId = storyChanges.getNewValues().getAfterId();
+    	String beforeId = storyChanges.getNewValues().getBeforeId();
+    	SheetRowValues rowValue = rowValuesMap.get(storyId);
+    	
+    	// Placed on the top of the list in tracker
+    	if(afterId == null && beforeId != null) {
+    		log.info("Move into first position");
+    		// Placed at the first index
+    		rowValues.add(0,rowValue.getColListValues());
+			// Remove current position
+			rowValues.remove(rowValue.getRowNum());
+		// Placed on the bottom of the list in tracker
+    	} else if (afterId != null && beforeId == null) {
+    		log.info("Move into last position");
+    		// Placed at the last index
+    		rowValues.add(rowValue.getColListValues());
+			// Remove current position
+			rowValues.remove(rowValue.getRowNum());
+    	// Placed in the middle, between story
+    	} else if (afterId != null && beforeId != null) {
+    		log.info("Move after id "+afterId);
+    		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
+    		Long position = afterIdStory.getRowNum() + 1;
+    		// Placed after / below afterId
+    		rowValues.add(position.intValue(),rowValue.getColListValues());
+			// Remove current position
+			rowValues.remove(rowValue.getRowNum());
+    	} else {
+    		log.info("No afterId or beforeId defined, do nothing");
+    	}
     	
     }
     
