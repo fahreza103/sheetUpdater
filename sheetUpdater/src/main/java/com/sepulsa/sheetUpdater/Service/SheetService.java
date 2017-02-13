@@ -290,6 +290,10 @@ public class SheetService {
     		log.info("Move after id "+afterId);
     		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
     		int position = afterIdStory.getRowNum();
+    		// if this is last position that moved to upper
+    		if(rowNum == rowValues.size()-1) {
+    			position++;
+    		}
 			// Remove current position
 			rowValues.remove(rowNum);
     		// Placed after / below afterId
