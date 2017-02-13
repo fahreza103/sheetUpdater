@@ -274,35 +274,27 @@ public class SheetService {
     	// Placed on the top of the list in tracker
     	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move into first position");
-			// Remove current position
-			rowValues.remove(rowNum);
     		// Placed at the first index
     		rowValues.add(0,rowValue.getColListValues());
+			// Remove current position
+			rowValues.remove(rowNum);
 		// Placed on the bottom of the list in tracker
     	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
     		log.info("Move into last position");
-			// Remove current position
-			rowValues.remove(rowNum);
     		// Placed at the last index
     		rowValues.add(rowValue.getColListValues());
+			// Remove current position
+			rowValues.remove(rowNum);
     	// Placed in the middle, between story
     	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move after id "+afterId);
-    		String message = webHook.getMessage().toLowerCase();
+    		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
+    		int position = afterIdStory.getRowNum() + 1;
 
-    		int position = 0;
-    		// if this story moved down, use afterId, move up, use beforeId
-    		if(message.contains("after")) {
-        		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
-    			position = afterIdStory.getRowNum();
-    		} else if(message.contains("before")) {
-        		SheetRowValues beforeIdStory = rowValuesMap.get(beforeId);
-    			position = beforeIdStory.getRowNum();
-    		}
+    		// Placed after / below afterId
+    		rowValues.add(position,rowValue.getColListValues());			
 			// Remove current position
 			rowValues.remove(rowNum);
-    		// Placed after / below afterId
-    		rowValues.add(position,rowValue.getColListValues());
     	} else {
     		log.info("No afterId or beforeId defined, do nothing");
     	}
