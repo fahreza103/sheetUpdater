@@ -272,26 +272,26 @@ public class SheetService {
     	// Placed on the top of the list in tracker
     	if(afterId == null && beforeId != null) {
     		log.info("Move into first position");
-    		// Placed at the first index
-    		rowValues.add(0,rowValue.getColListValues());
 			// Remove current position
 			rowValues.remove(rowValue.getRowNum());
+    		// Placed at the first index
+    		rowValues.add(0,rowValue.getColListValues());
 		// Placed on the bottom of the list in tracker
     	} else if (afterId != null && beforeId == null) {
     		log.info("Move into last position");
-    		// Placed at the last index
-    		rowValues.add(rowValue.getColListValues());
 			// Remove current position
 			rowValues.remove(rowValue.getRowNum());
+    		// Placed at the last index
+    		rowValues.add(rowValue.getColListValues());
     	// Placed in the middle, between story
     	} else if (afterId != null && beforeId != null) {
     		log.info("Move after id "+afterId);
     		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
     		Long position = afterIdStory.getRowNum() + 1;
-    		// Placed after / below afterId
-    		rowValues.add(position.intValue(),rowValue.getColListValues());
 			// Remove current position
 			rowValues.remove(rowValue.getRowNum());
+    		// Placed after / below afterId
+    		rowValues.add(position.intValue(),rowValue.getColListValues());
     	} else {
     		log.info("No afterId or beforeId defined, do nothing");
     	}

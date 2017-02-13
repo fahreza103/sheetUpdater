@@ -27,6 +27,7 @@ public class StringTool {
 		list.add("c");
 		
 		list.remove(1);
+		list.add(0,"b");
 		System.out.print(list);
 	}
 }
