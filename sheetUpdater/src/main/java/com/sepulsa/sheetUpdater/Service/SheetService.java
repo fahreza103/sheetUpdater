@@ -288,11 +288,16 @@ public class SheetService {
     	// Placed in the middle, between story
     	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move after id "+afterId);
-    		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
-    		int position = afterIdStory.getRowNum();
-    		// if this is last position that moved to upper
-    		if(rowNum == rowValues.size()-1) {
-    			position++;
+    		String message = webHook.getMessage().toLowerCase();
+
+    		int position = 0;
+    		// if this story moved down, use afterId, move up, use beforeId
+    		if(message.contains("after")) {
+        		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
+    			position = afterIdStory.getRowNum();
+    		} else if(message.contains("before")) {
+        		SheetRowValues beforeIdStory = rowValuesMap.get(beforeId);
+    			position = beforeIdStory.getRowNum();
     		}
 			// Remove current position
 			rowValues.remove(rowNum);
