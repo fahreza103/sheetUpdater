@@ -289,7 +289,7 @@ public class SheetService {
     	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move after id "+afterId);
     		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
-    		int position = afterIdStory.getRowNum() + 1;
+    		int position = afterIdStory.getRowNum();
 			// Remove current position
 			rowValues.remove(rowNum);
     		// Placed after / below afterId
