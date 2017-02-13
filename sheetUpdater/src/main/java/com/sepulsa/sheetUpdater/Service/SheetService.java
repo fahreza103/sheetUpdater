@@ -268,30 +268,32 @@ public class SheetService {
     	String afterId = storyChanges.getNewValues().getAfterId();
     	String beforeId = storyChanges.getNewValues().getBeforeId();
     	SheetRowValues rowValue = rowValuesMap.get(storyId);
-    	log.info("Story row position : "+rowValue.getRowNum());
+    	int rowNum = rowValue.getRowNum();
+    	
+    	log.info("Story row position : "+rowNum);
     	// Placed on the top of the list in tracker
     	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move into first position");
 			// Remove current position
-			rowValues.remove(rowValue.getRowNum());
+			rowValues.remove(rowNum);
     		// Placed at the first index
     		rowValues.add(0,rowValue.getColListValues());
 		// Placed on the bottom of the list in tracker
     	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
     		log.info("Move into last position");
 			// Remove current position
-			rowValues.remove(rowValue.getRowNum());
+			rowValues.remove(rowNum);
     		// Placed at the last index
     		rowValues.add(rowValue.getColListValues());
     	// Placed in the middle, between story
     	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move after id "+afterId);
     		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
-    		Long position = afterIdStory.getRowNum() + 1;
+    		int position = afterIdStory.getRowNum() + 1;
 			// Remove current position
-			rowValues.remove(rowValue.getRowNum());
+			rowValues.remove(rowNum);
     		// Placed after / below afterId
-    		rowValues.add(position.intValue(),rowValue.getColListValues());
+    		rowValues.add(position,rowValue.getColListValues());
     	} else {
     		log.info("No afterId or beforeId defined, do nothing");
     	}

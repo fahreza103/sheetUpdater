@@ -8,15 +8,15 @@ public class SheetRowValues implements Serializable {
 
 	private static final long serialVersionUID = -9064869522755421612L;
 
-	private long rowNum;
+	private Integer rowNum;
 	
 	private List<Object> colListValues = new ArrayList<Object>();
 
-	public long getRowNum() {
+	public Integer getRowNum() {
 		return rowNum;
 	}
 
-	public void setRowNum(long rowNum) {
+	public void setRowNum(Integer rowNum) {
 		this.rowNum = rowNum;
 	}
 
