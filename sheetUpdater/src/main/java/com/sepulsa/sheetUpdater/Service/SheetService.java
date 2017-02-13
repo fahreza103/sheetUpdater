@@ -268,7 +268,7 @@ public class SheetService {
     	String afterId = storyChanges.getNewValues().getAfterId();
     	String beforeId = storyChanges.getNewValues().getBeforeId();
     	SheetRowValues rowValue = rowValuesMap.get(storyId);
-    	
+    	log.info("Story row position : "+rowValue.getRowNum());
     	// Placed on the top of the list in tracker
     	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move into first position");
@@ -295,7 +295,7 @@ public class SheetService {
     	} else {
     		log.info("No afterId or beforeId defined, do nothing");
     	}
-    	
+    	log.info(rowValues);
     	writeToSheet(service,readRange,rowValues);
     }
     
