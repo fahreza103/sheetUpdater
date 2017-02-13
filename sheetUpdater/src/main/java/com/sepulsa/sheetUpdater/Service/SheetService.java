@@ -270,21 +270,21 @@ public class SheetService {
     	SheetRowValues rowValue = rowValuesMap.get(storyId);
     	
     	// Placed on the top of the list in tracker
-    	if(afterId == null && beforeId != null) {
+    	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move into first position");
 			// Remove current position
 			rowValues.remove(rowValue.getRowNum());
     		// Placed at the first index
     		rowValues.add(0,rowValue.getColListValues());
 		// Placed on the bottom of the list in tracker
-    	} else if (afterId != null && beforeId == null) {
+    	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
     		log.info("Move into last position");
 			// Remove current position
 			rowValues.remove(rowValue.getRowNum());
     		// Placed at the last index
     		rowValues.add(rowValue.getColListValues());
     	// Placed in the middle, between story
-    	} else if (afterId != null && beforeId != null) {
+    	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move after id "+afterId);
     		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
     		Long position = afterIdStory.getRowNum() + 1;
