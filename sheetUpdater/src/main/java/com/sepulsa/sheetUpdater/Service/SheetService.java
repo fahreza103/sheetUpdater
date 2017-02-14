@@ -252,13 +252,12 @@ public class SheetService {
 				rf.setObject(webHook);
 			} else if("created_at".equals(sdd.getFieldName()) || "updated_at".equals(sdd.getFieldName())) {
 				rf.setObject(content.getNewValues());
-				if(rf.getFieldValue(sdd.getFieldName())!= null) {
+				String classDateFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
+						JsonProperty.class, sdd.getFieldName());
+				if(rf.getFieldValue(classDateFieldName)!= null) {
 					Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
 					Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
-					
-					String classDateFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
-							JsonProperty.class, sdd.getFieldName());
-							
+												
 					rf.setFieldValue(classDateFieldName, date);
 				}
 			} else {
