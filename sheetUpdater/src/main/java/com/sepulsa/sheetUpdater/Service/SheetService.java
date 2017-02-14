@@ -245,6 +245,7 @@ public class SheetService {
         String readRange = sheetName+"!A2:F";
         
         List<List<Object>> rowValues = getRangeValues(service, readRange);
+    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
         List<Object> colList = new ArrayList<Object>();
         
         List<Content> changes = webHook.getChanges();
@@ -268,8 +269,8 @@ public class SheetService {
         SheetRowValues sheetRowValues = new SheetRowValues();
         sheetRowValues.setRowNum(rowValues.size()-1);
         sheetRowValues.setColListValues(colList);
-        
-        Map<String,SheetRowValues> rowValuesMap = new HashMap<String,SheetRowValues>();
+
+        // put the new story to map
         rowValuesMap.put(primaryResource.getId(), sheetRowValues);
     	// placed at the top of icebox, after the latest story in current / backlog
         rowValues = moveStory(webHook, rowValues, rowValuesMap);
