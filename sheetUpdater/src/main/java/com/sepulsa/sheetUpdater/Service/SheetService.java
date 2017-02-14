@@ -312,7 +312,7 @@ public class SheetService {
         if(AppConstant.ACTIVITY_CREATE.equals(kind)) {
         	Object [] newDataArray =  new Object[sheetDefinitionDetails.size()];
         	Arrays.fill(newDataArray, "");
-        	colList = Arrays.asList();
+        	colList = Arrays.asList(newDataArray);
             colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);
             
         	// placed at the top of icebox, after the latest story in current / backlog
