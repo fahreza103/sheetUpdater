@@ -245,7 +245,6 @@ public class SheetService {
         String readRange = sheetName+"!A2:F";
         
         List<List<Object>> rowValues = getRangeValues(service, readRange);
-    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
         List<Object> colList = new ArrayList<Object>();
         
         List<Content> changes = webHook.getChanges();
@@ -263,17 +262,17 @@ public class SheetService {
         colList.add(StringTool.replaceEmpty(webHook.getMessage(),"-"));
         colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
         log.info("write row :"+colList);
-        
-        rowValues.add(0,colList);
-        
-        SheetRowValues sheetRowValues = new SheetRowValues();
-        sheetRowValues.setRowNum(rowValues.size()-1);
-        sheetRowValues.setColListValues(colList);
-
-        // put the new story to map
-        rowValuesMap.put(primaryResource.getId(), sheetRowValues);
+             
     	// placed at the top of icebox, after the latest story in current / backlog
-        rowValues = moveStory(webHook, rowValues, rowValuesMap);
+        if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
+        	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+        	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
+        	int newStoryPosition = afterIdSheet.getRowNum() + 1;
+        	rowValues.add(newStoryPosition,colList);
+        // no afterId defined, which means no story in current / backlog
+        } else {
+            rowValues.add(0,colList);
+        }
 
         writeToSheet(service,readRange,rowValues);
     }
