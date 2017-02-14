@@ -32,7 +32,7 @@ public class Values implements Serializable {
 	private Long estimate;
 	@JsonProperty("created_at")
 	private Long createdAt;
-	@JsonProperty("updated_at")
+	@JsonProperty(value="updated_at")
 	private Long updatedAt;
 	@JsonProperty("before_id")
 	private String beforeId;

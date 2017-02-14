@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sepulsa.sheetUpdater.Object.Content;
 import com.sepulsa.sheetUpdater.Object.SheetDefinition;
 import com.sepulsa.sheetUpdater.Object.SheetDefinitionDetail;
+import com.sepulsa.sheetUpdater.Object.Values;
 import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.Service.JsonService;
 
@@ -32,8 +34,8 @@ public class StringTool {
 	}
 	
 	public static void main (String[] args) {
-		List<String> list = Arrays.asList(new String[5]);
-		list.set(4, "aa");
-		System.out.println(list);
+		Values values = new Values();
+		String fldName = new ReflectionUtil(values).getFieldNameFromAnnotation(values, JsonProperty.class, "updated_at");
+		System.out.println(fldName);
 	}
 }

@@ -1,6 +1,8 @@
 package com.sepulsa.sheetUpdater.util;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 
 public class ReflectionUtil {
@@ -9,6 +11,26 @@ public class ReflectionUtil {
 	
 	public ReflectionUtil(Object object) {
 		this.object = object;
+	}
+	
+	public String getFieldNameFromAnnotation(Object object, Class<? extends Annotation> annotationClass, String annotationValue) {
+		try {
+			for(Field f:object.getClass().getDeclaredFields()) {
+				if(f.isAnnotationPresent(annotationClass)) {
+					Object value = "";
+					Annotation annotation = f.getAnnotation(annotationClass);
+					Method method = annotationClass.getDeclaredMethod("value");
+		            value = method.invoke(annotation, (Object[])null);           
+
+				    if(annotationValue.equals(value)) {
+				    	return f.getName();
+				    }
+				} 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		return null;
 	}
 	
 	public Object getFieldValue (String fieldName) {

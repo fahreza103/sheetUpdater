@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -242,6 +243,7 @@ public class SheetService {
         List<Content> changes = webHook.getChanges();
         Content content = getStoryChanges(changes);
         
+        
         int index = 0;
     	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
 			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
@@ -253,7 +255,11 @@ public class SheetService {
 				if(rf.getFieldValue(sdd.getFieldName())!= null) {
 					Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
 					Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
-					rf.setFieldValue(sdd.getFieldName(), date);
+					
+					String classFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
+							JsonProperty.class, sdd.getFieldName());
+							
+					rf.setFieldValue(classFieldName, date);
 				}
 			} else {
 				rf.setObject(content.getNewValues());
@@ -261,7 +267,9 @@ public class SheetService {
 			
 			// null means no field passed from request, it can valued by empty string that means something changed to empty
 			if(rf.getFieldValue(sdd.getFieldName()) != null) {
-				colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),"-")); 
+				String classFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
+						JsonProperty.class, sdd.getFieldName());
+				colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(classFieldName),"-")); 
 			}
 			
 			index++;
