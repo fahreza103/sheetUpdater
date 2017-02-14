@@ -28,6 +28,8 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.Object.Content;
+import com.sepulsa.sheetUpdater.Object.SheetDefinition;
+import com.sepulsa.sheetUpdater.Object.SheetDefinitionDetail;
 import com.sepulsa.sheetUpdater.Object.SheetRowValues;
 import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.util.DateTool;
@@ -60,6 +62,8 @@ public class SheetService {
     private static final int DEFAULT_PORT = 8181;
     
     private static final String KIND_STORY = "story";
+    
+
     
     @Value("${server.port}")
     private String appPort;
@@ -224,17 +228,23 @@ public class SheetService {
 			// Remove current position
 			rowValues.remove(rowNum);
     	} else {
-    		log.info("No afterId or beforeId defined, do nothing");
+    		log.info("No afterId or beforeId defined, not moving anything"	);
     	}
     	log.debug(rowValues);
     	return rowValues;
+    }
+    
+    public void addStory2(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
+    	List<SheetDefinitionDetail> sheetDefinitionDetail = sheetDefinition.getSheetDefinitionDetailListSorted();
+
+    	
     }
     
     public void addStory(WebHook webHook) throws IOException {
     	Sheets service = getSheetsService();
         String readRange = sheetName+"!A2:F";
         
-        List<List<Object>> rowList = getRangeValues(service, readRange);
+        List<List<Object>> rowValues = getRangeValues(service, readRange);
         List<Object> colList = new ArrayList<Object>();
         
         List<Content> changes = webHook.getChanges();
@@ -253,9 +263,18 @@ public class SheetService {
         colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
         log.info("write row :"+colList);
         
-        rowList.add(0,colList);
+        rowValues.add(0,colList);
+        
+        SheetRowValues sheetRowValues = new SheetRowValues();
+        sheetRowValues.setRowNum(rowValues.size()-1);
+        sheetRowValues.setColListValues(colList);
+        
+        Map<String,SheetRowValues> rowValuesMap = new HashMap<String,SheetRowValues>();
+        rowValuesMap.put(primaryResource.getId(), sheetRowValues);
+    	// placed at the top of icebox, after the latest story in current / backlog
+        rowValues = moveStory(webHook, rowValues, rowValuesMap);
 
-        writeToSheet(service,readRange,rowList);
+        writeToSheet(service,readRange,rowValues);
     }
     
     public void updateStory(WebHook webHook) throws IOException {

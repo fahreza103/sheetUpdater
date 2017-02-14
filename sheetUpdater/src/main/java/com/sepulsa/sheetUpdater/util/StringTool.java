@@ -1,7 +1,7 @@
 package com.sepulsa.sheetUpdater.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.sepulsa.sheetUpdater.Object.SheetDefinition;
+import com.sepulsa.sheetUpdater.Service.JsonService;
 
 public class StringTool {
 
@@ -20,14 +20,15 @@ public class StringTool {
 		return text;		
 	}
 	
+	public static String getCharForNumber(int i) {
+	    return i > 0 && i < 27 ? String.valueOf((char)(i + 'A' - 1)) : null;
+	}
+	
 	public static void main (String[] args) {
-		List<String> list = new ArrayList<String>();
-		list.add("a");
-		list.add("b");
-		list.add("c");
-		
-		list.remove(1);
-		list.add(0,"b");
-		System.out.print(list);
+		JsonService js = new JsonService();
+		String sheetMappingJson = FileTool.getStrFileContent("sheetMapping.json");
+		// Convert to JSON
+		SheetDefinition sheetDefinition = js.convertToObject(sheetMappingJson,SheetDefinition.class);
+		System.out.println(sheetDefinition);
 	}
 }

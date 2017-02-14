@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sepulsa.sheetUpdater.Object.WebHook;
 
 /**
  * 
@@ -23,23 +22,25 @@ public class JsonService {
 	
 	/**
 	 * Convert json string into WebHook Pojo 
+	 * @param <T> 
 	 * @param json string
 	 * @return WebHook Object
 	 */
-	public WebHook convertToObject (String json) {
-		log.debug("Convert json to object, json string :"+json);
+	@SuppressWarnings("unchecked")
+	public <T> T convertToObject (String json, Class<?> clazz) {
 		try {
 			// Replace null values with empty String, it means something changed to empty
 			json = json.replaceAll("null", "\"\"");
+			log.info("Convert json to object, json string :"+json);
 			
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			WebHook webHook = mapper.readValue(json, WebHook.class);
+			T jsobObj = (T) mapper.readValue(json, clazz);
 			
 			// Pretty print, log the values in String from the object
-			String webHookStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(webHook);
+			String webHookStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsobObj);
 			log.info(webHookStr);
-			return webHook;
+			return (T) jsobObj;
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {

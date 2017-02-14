@@ -1,0 +1,13 @@
+{
+  "idField": "id",
+  "mapping": [{
+    "fieldName" : "name",
+    "column" : "B"
+  }, {
+    "fieldName" : "description",
+    "column" : "C"
+  }, {
+    "fieldName" : "id",
+    "column" : "A"
+  }  ]
+}

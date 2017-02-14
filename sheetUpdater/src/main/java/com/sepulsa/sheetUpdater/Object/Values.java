@@ -3,6 +3,8 @@ package com.sepulsa.sheetUpdater.Object;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -14,6 +16,8 @@ public class Values implements Serializable {
 	
 	@JsonProperty("id")
 	private String id;
+	@JsonProperty("story_type")
+	private String storyType;
 	@JsonProperty("story_id")
 	private String storyId;
 	@JsonProperty("text")
@@ -286,8 +290,16 @@ public class Values implements Serializable {
 	public void setRequestedById(String requestedById) {
 		this.requestedById = requestedById;
 	}
+	public String getStoryType() {
+		return storyType;
+	}
+	public void setStoryType(String storyType) {
+		this.storyType = storyType;
+	}
 	
-	
-	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
 
 }
