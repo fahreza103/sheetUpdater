@@ -11,7 +11,7 @@ import com.sepulsa.sheetUpdater.Service.JsonService;
 
 public class StringTool {
 
-	public static boolean isEmpty(String text) {
+	public static boolean isEmpty(Object text) {
 		if(text == null || "".equals(text)) {
 			return true;
 		} 
@@ -19,7 +19,7 @@ public class StringTool {
 		
 	}
 	
-	public static String replaceEmpty(String text, String replacement) {
+	public static Object replaceEmpty(Object text, String replacement) {
 		if(isEmpty(text)) {
 			return replacement;
 		} 

@@ -236,6 +236,32 @@ public class SheetService {
     	return rowValues;
     }
     
+    private List<Object> fillColumnValue(List<SheetDefinitionDetail> sheetDefinitionDetails, List<Object> colList, WebHook webHook) {
+        ReflectionUtil rf = new ReflectionUtil(webHook);
+        List<Content> changes = webHook.getChanges();
+        Content content = getStoryChanges(changes);
+        
+    	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
+    		rf.setObject(content.getNewValues());
+			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
+				rf.setObject(webHook.getPrimaryResources().get(0));
+				colList.add(StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),""));
+			} else if("message".equals(sdd.getFieldName())) {
+				rf.setObject(webHook);
+				colList.add(StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),""));
+			} else if("created_at".equals(sdd.getFieldName()) || "updated_at".equals(sdd.getFieldName())) {
+				rf.setObject(content.getNewValues());
+				Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
+				Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
+				colList.add(date);
+			} else {
+				rf.setObject(content.getNewValues());
+				colList.add(StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),""));
+			}
+    	}
+    	return colList;
+    }
+    
     private UpdateValuesResponse writeHeader (Sheets service, SheetDefinition sheetDefinition) throws IOException {
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailList();
     	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
@@ -265,21 +291,12 @@ public class SheetService {
     	String readRange = sheetName+"!A2:"+endColumn;
     	
         List<List<Object>> rowValues = getRangeValues(service, readRange);
-        List<Object> colList = new ArrayList<Object>();
         List<Content> changes = webHook.getChanges();
         Content content = getStoryChanges(changes);
-        ReflectionUtil rf = new ReflectionUtil(webHook);
-        
-    	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
-			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
-				rf.setObject(webHook.getPrimaryResources().get(0));
-				colList.add(rf.getFieldValue(sdd.getFieldName()));
-			} else {
-				rf.setObject(content.getNewValues());
-				colList.add(rf.getFieldValue(sdd.getFieldName()));
-			}
-    	}
-    	
+        List<Object> colList = new ArrayList<Object>();
+        colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);
+
+
     	// placed at the top of icebox, after the latest story in current / backlog
         if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
         	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
