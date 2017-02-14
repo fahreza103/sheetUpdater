@@ -255,7 +255,7 @@ public class SheetService {
 				String classDateFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
 						JsonProperty.class, sdd.getFieldName());
 				if(rf.getFieldValue(classDateFieldName)!= null) {
-					Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
+					Date insertDate = new Date((Long)rf.getFieldValue(classDateFieldName));
 					Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
 												
 					rf.setFieldValue(classDateFieldName, date);
