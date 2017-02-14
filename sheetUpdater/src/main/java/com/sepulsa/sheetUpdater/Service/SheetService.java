@@ -26,6 +26,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.Object.Content;
 import com.sepulsa.sheetUpdater.Object.SheetDefinition;
@@ -33,6 +34,7 @@ import com.sepulsa.sheetUpdater.Object.SheetDefinitionDetail;
 import com.sepulsa.sheetUpdater.Object.SheetRowValues;
 import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.util.DateTool;
+import com.sepulsa.sheetUpdater.util.ReflectionUtil;
 import com.sepulsa.sheetUpdater.util.StringTool;
 
 @Component
@@ -180,9 +182,9 @@ public class SheetService {
         return null;
     }
     
-    private void writeToSheet(Sheets service, String writeRange, List<List<Object>> rowValues) throws IOException {
+    private UpdateValuesResponse writeToSheet(Sheets service, String writeRange, List<List<Object>> rowValues) throws IOException {
         ValueRange vr = new ValueRange().setValues(rowValues).setMajorDimension("ROWS");
-        service.spreadsheets().values()
+        return service.spreadsheets().values()
                 .update(spreadSheetId, writeRange, vr)
                 .setValueInputOption("RAW")
                 .execute();
@@ -234,9 +236,62 @@ public class SheetService {
     	return rowValues;
     }
     
+    private UpdateValuesResponse writeHeader (Sheets service, SheetDefinition sheetDefinition) throws IOException {
+    	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailList();
+    	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
+    	String readRange = sheetName+"!A1:"+endColumn;
+    	
+        List<List<Object>> rowValues = getRangeValues(service, readRange);
+        // if size == 0 , the header not write in the sheet
+        if(rowValues.size() == 0) {
+        	List<Object> colValues = new ArrayList<Object>();
+        	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
+        		colValues.add(sdd.getViewName());
+        	}
+        	rowValues.add(colValues);
+        	return writeToSheet(service, readRange, rowValues);
+        }
+        return null;
+    }
+    
     public void addStory2(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
-    	List<SheetDefinitionDetail> sheetDefinitionDetail = sheetDefinition.getSheetDefinitionDetailListSorted();
+    	Sheets service = getSheetsService();
+    	
+    	// Write header if not yet write in sheet
+    	writeHeader(service, sheetDefinition);
+    	
+    	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
+    	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
+    	String readRange = sheetName+"!A2:"+endColumn;
+    	
+        List<List<Object>> rowValues = getRangeValues(service, readRange);
+        List<Object> colList = new ArrayList<Object>();
+        List<Content> changes = webHook.getChanges();
+        Content content = getStoryChanges(changes);
+        ReflectionUtil rf = new ReflectionUtil(webHook);
+        
+    	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
+			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
+				rf.setObject(webHook.getPrimaryResources().get(0));
+				colList.add(rf.getFieldValue(sdd.getFieldName()));
+			} else {
+				rf.setObject(content.getNewValues());
+				colList.add(rf.getFieldValue(sdd.getFieldName()));
+			}
+    	}
+    	
+    	// placed at the top of icebox, after the latest story in current / backlog
+        if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
+        	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+        	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
+        	int newStoryPosition = afterIdSheet.getRowNum() + 1;
+        	rowValues.add(newStoryPosition,colList);
+        // no afterId defined, which means no story in current / backlog
+        } else {
+            rowValues.add(0,colList);
+        }
 
+        writeToSheet(service,readRange,rowValues);
     	
     }
     

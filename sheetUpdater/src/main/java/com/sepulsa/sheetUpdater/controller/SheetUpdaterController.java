@@ -52,7 +52,7 @@ public class SheetUpdaterController {
 		String kind = webHook.getKind();
 		
 		if(ACTIVITY_CREATE.equals(kind)) {
-			sheetService.addStory(webHook);
+			sheetService.addStory2(webHook,sheetDefinition);
 		} else if (ACTIVITY_MOVE.equals(kind)) {
 			sheetService.moveStory(webHook);
 		} else if (ACTIVITY_UPDATE.equals(kind)) {

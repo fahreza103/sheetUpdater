@@ -1,12 +1,15 @@
 {
   "idField": "id",
   "mapping": [{
+  	"viewName" : "Story Name",
     "fieldName" : "name",
     "column" : "B"
   }, {
+    "viewName" : "Description",
     "fieldName" : "description",
     "column" : "C"
   }, {
+    "viewName" : "Story Id",
     "fieldName" : "id",
     "column" : "A"
   }  ]

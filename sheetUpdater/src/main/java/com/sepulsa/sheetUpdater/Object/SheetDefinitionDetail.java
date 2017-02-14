@@ -12,6 +12,8 @@ public class SheetDefinitionDetail implements Serializable {
 
 	@JsonProperty("fieldName")
 	private String fieldName;
+	@JsonProperty("viewName")
+	private String viewName;
 	@JsonProperty("column")
 	private String column;
 	
@@ -26,6 +28,12 @@ public class SheetDefinitionDetail implements Serializable {
 	}
 	public void setColumn(String column) {
 		this.column = column;
+	}
+	public String getViewName() {
+		return viewName;
+	}
+	public void setViewName(String viewName) {
+		this.viewName = viewName;
 	}
 	
 	@Override
