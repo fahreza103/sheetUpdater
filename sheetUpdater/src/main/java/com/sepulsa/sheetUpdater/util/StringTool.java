@@ -35,7 +35,7 @@ public class StringTool {
 	
 	public static void main (String[] args) {
 		Values values = new Values();
-		String fldName = new ReflectionUtil(values).getFieldNameFromAnnotation(values, JsonProperty.class, "updated_at");
+		String fldName = new ReflectionUtil(values).getFieldNameFromAnnotation(values, JsonProperty.class, "current_state");
 		System.out.println(fldName);
 	}
 }

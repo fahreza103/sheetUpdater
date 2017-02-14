@@ -256,19 +256,20 @@ public class SheetService {
 					Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
 					Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
 					
-					String classFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
+					String classDateFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
 							JsonProperty.class, sdd.getFieldName());
 							
-					rf.setFieldValue(classFieldName, date);
+					rf.setFieldValue(classDateFieldName, date);
 				}
 			} else {
 				rf.setObject(content.getNewValues());
 			}
 			
+			String classFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
+					JsonProperty.class, sdd.getFieldName());
 			// null means no field passed from request, it can valued by empty string that means something changed to empty
-			if(rf.getFieldValue(sdd.getFieldName()) != null) {
-				String classFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
-						JsonProperty.class, sdd.getFieldName());
+			if(rf.getFieldValue(classFieldName) != null) {
+
 				colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(classFieldName),"-")); 
 			}
 			
