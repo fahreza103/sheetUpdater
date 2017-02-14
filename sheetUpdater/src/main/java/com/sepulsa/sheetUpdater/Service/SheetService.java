@@ -33,6 +33,7 @@ import com.sepulsa.sheetUpdater.Object.SheetDefinition;
 import com.sepulsa.sheetUpdater.Object.SheetDefinitionDetail;
 import com.sepulsa.sheetUpdater.Object.SheetRowValues;
 import com.sepulsa.sheetUpdater.Object.WebHook;
+import com.sepulsa.sheetUpdater.constant.AppConstant;
 import com.sepulsa.sheetUpdater.util.DateTool;
 import com.sepulsa.sheetUpdater.util.ReflectionUtil;
 import com.sepulsa.sheetUpdater.util.StringTool;
@@ -241,23 +242,29 @@ public class SheetService {
         List<Content> changes = webHook.getChanges();
         Content content = getStoryChanges(changes);
         
+        int index = 0;
     	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
-    		rf.setObject(content.getNewValues());
 			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
 				rf.setObject(webHook.getPrimaryResources().get(0));
-				colList.add(StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),""));
-			} else if("message".equals(sdd.getFieldName())) {
+			} else if("message".equals(sdd.getFieldName())||"project_version".equals(sdd.getFieldName())) {
 				rf.setObject(webHook);
-				colList.add(StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),""));
 			} else if("created_at".equals(sdd.getFieldName()) || "updated_at".equals(sdd.getFieldName())) {
 				rf.setObject(content.getNewValues());
-				Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
-				Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
-				colList.add(date);
+				if(rf.getFieldValue(sdd.getFieldName())!= null) {
+					Date insertDate = new Date((Long)rf.getFieldValue(sdd.getFieldName()));
+					Object date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
+					rf.setFieldValue(sdd.getFieldName(), date);
+				}
 			} else {
 				rf.setObject(content.getNewValues());
-				colList.add(StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),""));
 			}
+			
+			// null means no field passed from request, it can valued by empty string that means something changed to empty
+			if(rf.getFieldValue(sdd.getFieldName()) != null) {
+				colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(sdd.getFieldName()),"-")); 
+			}
+			
+			index++;
     	}
     	return colList;
     }
@@ -280,7 +287,8 @@ public class SheetService {
         return null;
     }
     
-    public void addStory2(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
+    public void addUpdateStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
+    	String kind = webHook.getKind();
     	Sheets service = getSheetsService();
     	
     	// Write header if not yet write in sheet
@@ -289,64 +297,52 @@ public class SheetService {
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
     	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
     	String readRange = sheetName+"!A2:"+endColumn;
+    	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
         List<List<Object>> rowValues = getRangeValues(service, readRange);
         List<Content> changes = webHook.getChanges();
+        List<Object> colList = null;
+        
+    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+
         Content content = getStoryChanges(changes);
-        List<Object> colList = new ArrayList<Object>();
-        colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);
+        // for update activity
+    	SheetRowValues updatedStory = rowValuesMap.get(storyId);
 
+        if(AppConstant.ACTIVITY_CREATE.equals(kind)) {
+        	Object [] newDataArray =  new Object[sheetDefinitionDetails.size()];
+        	Arrays.fill(newDataArray, "");
+        	colList = Arrays.asList();
+            colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);
+            
+        	// placed at the top of icebox, after the latest story in current / backlog
+            if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
 
-    	// placed at the top of icebox, after the latest story in current / backlog
-        if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
-        	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
-        	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
-        	int newStoryPosition = afterIdSheet.getRowNum() + 1;
-        	rowValues.add(newStoryPosition,colList);
-        // no afterId defined, which means no story in current / backlog
-        } else {
-            rowValues.add(0,colList);
+            	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
+            	int newStoryPosition = afterIdSheet.getRowNum() + 1;
+            	rowValues.add(newStoryPosition,colList);
+            // no afterId defined, which means no story in current / backlog
+            } else {
+                rowValues.add(0,colList);
+            }
+
+        } else if (AppConstant.ACTIVITY_UPDATE.equals(kind)) {
+        	colList = updatedStory.getColListValues();
+        	log.info("OLD VALUES : "+colList);
+            colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);
+        	log.info("NEW VALUES : "+colList);
+        	
+        	// Update the values
+        	updatedStory.setColListValues(colList);
+        	rowValues.set(updatedStory.getRowNum(), colList);
+        	rowValuesMap.put(storyId, updatedStory);
+        	// if there is an update to start the project, this story will move to the top
+        	rowValues = moveStory(webHook, rowValues, rowValuesMap);
         }
+
 
         writeToSheet(service,readRange,rowValues);
     	
-    }
-    
-    public void addStory(WebHook webHook) throws IOException {
-    	Sheets service = getSheetsService();
-        String readRange = sheetName+"!A2:F";
-        
-        List<List<Object>> rowValues = getRangeValues(service, readRange);
-        List<Object> colList = new ArrayList<Object>();
-        
-        List<Content> changes = webHook.getChanges();
-        Content content = getStoryChanges(changes);
-        
-        List<Content> primaryResources = webHook.getPrimaryResources();
-        Content primaryResource = primaryResources.get(0);
-        
-        Date insertDate = new Date(webHook.getOccuredAt());
-        
-        colList.add(StringTool.replaceEmpty(primaryResource.getId(),"-"));
-        colList.add(StringTool.replaceEmpty(primaryResource.getName(),"-"));
-        colList.add(StringTool.replaceEmpty(content.getNewValues().getCurrentState(),"-"));
-        colList.add(StringTool.replaceEmpty(content.getNewValues().getDescription(),"-"));
-        colList.add(StringTool.replaceEmpty(webHook.getMessage(),"-"));
-        colList.add(StringTool.replaceEmpty(DateTool.getDateDMY(insertDate),"-"));
-        log.info("write row :"+colList);
-             
-    	// placed at the top of icebox, after the latest story in current / backlog
-        if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
-        	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
-        	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
-        	int newStoryPosition = afterIdSheet.getRowNum() + 1;
-        	rowValues.add(newStoryPosition,colList);
-        // no afterId defined, which means no story in current / backlog
-        } else {
-            rowValues.add(0,colList);
-        }
-
-        writeToSheet(service,readRange,rowValues);
     }
     
     public void updateStory(WebHook webHook) throws IOException {

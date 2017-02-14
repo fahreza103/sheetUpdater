@@ -15,6 +15,7 @@ import com.sepulsa.sheetUpdater.Object.SheetDefinition;
 import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.Service.JsonService;
 import com.sepulsa.sheetUpdater.Service.SheetService;
+import com.sepulsa.sheetUpdater.constant.AppConstant;
 import com.sepulsa.sheetUpdater.util.FileTool;
 
 @RestController
@@ -23,10 +24,6 @@ public class SheetUpdaterController {
 
 	Logger log = Logger.getLogger(SheetUpdaterController.class);
 	
-    private static final String SHEET_MAPPING_FILE = "sheetMapping.json";
-	private static final String ACTIVITY_CREATE = "story_create_activity";
-	private static final String ACTIVITY_MOVE = "story_move_activity";
-	private static final String ACTIVITY_UPDATE = "story_update_activity";
 	
 	@Autowired
 	private SheetService sheetService;
@@ -44,20 +41,18 @@ public class SheetUpdaterController {
 		// Convert to JSON from string requestBody
 		WebHook webHook = jsonService.convertToObject(json,WebHook.class);
 		// Read sheetMapping.json (mapping column configuration)
-		String sheetMappingJson = FileTool.getStrFileContent(SHEET_MAPPING_FILE);
+		String sheetMappingJson = FileTool.getStrFileContent(AppConstant.SHEET_MAPPING_FILE);
 		// Convert to JSON
 		SheetDefinition sheetDefinition = jsonService.convertToObject(sheetMappingJson,SheetDefinition.class);
 		
 		// Get kind (activity by user in pivotal)
 		String kind = webHook.getKind();
 		
-		if(ACTIVITY_CREATE.equals(kind)) {
-			sheetService.addStory2(webHook,sheetDefinition);
-		} else if (ACTIVITY_MOVE.equals(kind)) {
+		if(AppConstant.ACTIVITY_CREATE.equals(kind) || AppConstant.ACTIVITY_UPDATE.equals(kind)) {
+			sheetService.addUpdateStory(webHook,sheetDefinition);
+		} else if (AppConstant.ACTIVITY_MOVE.equals(kind)) {
 			sheetService.moveStory(webHook);
-		} else if (ACTIVITY_UPDATE.equals(kind)) {
-			sheetService.updateStory(webHook);
-		}
+		} 
 	  
 		return json;
 	}

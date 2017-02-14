@@ -12,5 +12,21 @@
     "viewName" : "Story Id",
     "fieldName" : "id",
     "column" : "A"
+  },{
+    "viewName" : "Status",
+    "fieldName" : "current_state",
+    "column" : "D"
+  },{
+    "viewName" : "Story Type",
+    "fieldName" : "story_type",
+    "column" : "E"
+  },{
+    "viewName" : "Point",
+    "fieldName" : "estimate",
+    "column" : "F"
+  },{
+    "viewName" : "Update Time",
+    "fieldName" : "updated_at",
+    "column" : "G"
   }  ]
 }

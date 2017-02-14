@@ -1,6 +1,7 @@
 package com.sepulsa.sheetUpdater.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.sepulsa.sheetUpdater.Object.Content;
@@ -31,26 +32,8 @@ public class StringTool {
 	}
 	
 	public static void main (String[] args) {
-		JsonService js = new JsonService();
-		String dummyJson = FileTool.getStrFileContent("dummyRequest.json");
-		String sheetMappingJson = FileTool.getStrFileContent("sheetMapping.json");
-		// Convert to JSON
-		SheetDefinition sheetDefinition = js.convertToObject(sheetMappingJson,SheetDefinition.class);
-		WebHook webHook = js.convertToObject(dummyJson,WebHook.class);
-		ReflectionUtil rf = new ReflectionUtil(webHook);
-		
-		List<Object> colList = new ArrayList<Object>();
-		for(SheetDefinitionDetail sdd : sheetDefinition.getSheetDefinitionDetailListSorted()) {
-			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
-				rf.setObject(webHook.getPrimaryResources().get(0));
-				colList.add(rf.getFieldValue(sdd.getFieldName()));
-			}  else {
-				Content content = webHook.getChanges().get(1);
-				rf.setObject(content.getNewValues());
-				colList.add(rf.getFieldValue(sdd.getFieldName()));
-			}
-		}
-		
-		System.out.println(colList);
+		List<String> list = Arrays.asList(new String[5]);
+		list.set(4, "aa");
+		System.out.println(list);
 	}
 }

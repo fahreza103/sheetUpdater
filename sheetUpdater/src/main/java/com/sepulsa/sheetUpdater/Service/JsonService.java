@@ -36,10 +36,7 @@ public class JsonService {
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			T jsobObj = (T) mapper.readValue(json, clazz);
-			
-			// Pretty print, log the values in String from the object
-			String webHookStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsobObj);
-			log.info(webHookStr);
+
 			return (T) jsobObj;
 		} catch (JsonParseException e) {
 			e.printStackTrace();
