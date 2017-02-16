@@ -325,6 +325,7 @@ public class SheetService {
     	Sheet sheet = sheetRepo.findOne(new Long(1));
     	// Save if empty
     	if(sheet == null) {
+    		log.info("Sheet is empty, insert into db");
     		sheet = new Sheet();
     		sheet.setId(new Long(1));
     		sheet.setSheetId(spreadSheetId);
@@ -338,6 +339,7 @@ public class SheetService {
     	// Update if different, it means there's change in the sheetMapping.json
     	// and sheet must be empty, if not, nothing changed
     	if(!sheetMappingJson.equals(sheet.getStructure()) && rowValues.isEmpty()) {
+    		log.info("Header is empty and there's change in sheetMapping.json file");
     		sheet.setStructure(sheetMappingJson);
     		sheetRepo.save(sheet);
     	} 
