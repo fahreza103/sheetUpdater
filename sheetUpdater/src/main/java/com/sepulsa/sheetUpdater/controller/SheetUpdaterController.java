@@ -51,7 +51,7 @@ public class SheetUpdaterController {
 		if(AppConstant.ACTIVITY_CREATE.equals(kind) || AppConstant.ACTIVITY_UPDATE.equals(kind)) {
 			sheetService.addUpdateStory(webHook,sheetDefinition);
 		} else if (AppConstant.ACTIVITY_MOVE.equals(kind)) {
-			sheetService.moveStory(webHook);
+			sheetService.moveStory(webHook,sheetDefinition);
 		} 
 	  
 		return json;
