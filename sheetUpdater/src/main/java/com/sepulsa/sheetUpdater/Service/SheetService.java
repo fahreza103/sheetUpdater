@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -245,7 +246,8 @@ public class SheetService {
     	return readRange;
     }
     
-    private List<Object> fillColumnValue(List<SheetDefinitionDetail> sheetDefinitionDetails, List<Object> colList, WebHook webHook) {
+    @SuppressWarnings("unchecked")
+	private List<Object> fillColumnValue(List<SheetDefinitionDetail> sheetDefinitionDetails, List<Object> colList, WebHook webHook) {
         ReflectionUtil rf = new ReflectionUtil(webHook);
         List<Content> changes = webHook.getChanges();
         Content content = getStoryChanges(changes);
@@ -276,7 +278,13 @@ public class SheetService {
 				if(date != null) {
 					colList.set(index,date); 
 				} else {
-					colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(classFieldName),"-")); 
+					// The value is collection, for example like labels
+					if(rf.getFieldValue(classFieldName) instanceof Collection<?>) {
+						List<Object> valueList = (List<Object>) rf.getFieldValue(classFieldName);
+						colList.set(index,StringTool.replaceEmpty(StringTool.joinListDelimited(valueList,","),"-"));
+					} else {
+						colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(classFieldName),"-")); 	
+					}
 				}
 			}
 

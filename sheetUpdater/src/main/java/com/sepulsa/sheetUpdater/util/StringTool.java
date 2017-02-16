@@ -1,6 +1,11 @@
 package com.sepulsa.sheetUpdater.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 
 
@@ -59,7 +64,19 @@ public class StringTool {
 		return false;
 	}
 	
+	/**
+	 * Convert collection object into single string with delimiter
+	 * @param collection
+	 * @param delimiter
+	 * @return string with delimiter 
+	 */
+	public static String joinListDelimited(Collection<?> collection, String delimiter) {
+		return StringUtils.join(collection,delimiter);
+	}
+	
 	public static void main (String[] args) {
-		System.out.println(new String[]{"a","b","c"});
+		List<String> list = new ArrayList<String>();
+		list.add("s");
+		System.out.println(StringUtils.join(list,","));
 	}
 }
