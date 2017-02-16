@@ -143,7 +143,7 @@ public class SheetService {
     public Sheets getSheetsService() throws IOException {
     	if(sheet == null) {
 	        Credential credential = authorize();
-	        return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+	        this.sheet = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 	                .setApplicationName(APPLICATION_NAME)
 	                .build();
     	}
