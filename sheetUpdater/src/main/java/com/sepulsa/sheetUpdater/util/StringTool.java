@@ -1,19 +1,21 @@
 package com.sepulsa.sheetUpdater.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.lang.ArrayUtils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sepulsa.sheetUpdater.Object.Content;
-import com.sepulsa.sheetUpdater.Object.SheetDefinition;
-import com.sepulsa.sheetUpdater.Object.SheetDefinitionDetail;
-import com.sepulsa.sheetUpdater.Object.Values;
-import com.sepulsa.sheetUpdater.Object.WebHook;
-import com.sepulsa.sheetUpdater.Service.JsonService;
 
+
+/**
+ * String operations defined here
+ * @author Fahreza Tamara
+ *
+ */
 public class StringTool {
 
+	/**
+	 * Check if the string is empty
+	 * @param text
+	 * @return true if the string is null or empty string, false otherwise
+	 */
 	public static boolean isEmpty(Object text) {
 		if(text == null || "".equals(text)) {
 			return true;
@@ -22,6 +24,12 @@ public class StringTool {
 		
 	}
 	
+	/**
+	 * Replace the string, if empty or null
+	 * @param text
+	 * @param replacement
+	 * @return replacement string as specified in parameter, if the string is null
+	 */
 	public static Object replaceEmpty(Object text, String replacement) {
 		if(isEmpty(text)) {
 			return replacement;
@@ -29,13 +37,29 @@ public class StringTool {
 		return text;		
 	}
 	
+	/**
+	 * Change the specified integer into letter, for example 1 => A , 2 => B until 26 => Z
+	 * @param i
+	 * @return String letter
+	 */
 	public static String getCharForNumber(int i) {
 	    return i > 0 && i < 27 ? String.valueOf((char)(i + 'A' - 1)) : null;
 	}
 	
+	/**
+	 * Check the string contains in array
+	 * @param text
+	 * @param arrayStr
+	 * @return true if the string exist, false otherwise
+	 */
+	public static Boolean inArray (String text, Object[] arrayStr) {
+		if(ArrayUtils.contains(arrayStr, text)) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static void main (String[] args) {
-		Values values = new Values();
-		String fldName = new ReflectionUtil(values).getFieldNameFromAnnotation(values, JsonProperty.class, "current_state");
-		System.out.println(fldName);
+		System.out.println(new String[]{"a","b","c"});
 	}
 }

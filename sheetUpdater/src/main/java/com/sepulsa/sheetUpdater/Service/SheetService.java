@@ -253,11 +253,11 @@ public class SheetService {
         
         int index = 0;
     	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
-			if("id".equals(sdd.getFieldName()) || "name".equals(sdd.getFieldName())) {
+			if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_PRIMARY_RES)) {
 				rf.setObject(webHook.getPrimaryResources().get(0));
-			} else if("message".equals(sdd.getFieldName())||"project_version".equals(sdd.getFieldName())) {
+			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_MAIN)) {
 				rf.setObject(webHook);
-			} else if("created_at".equals(sdd.getFieldName()) || "updated_at".equals(sdd.getFieldName())) {
+			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_DATETIME)) {
 				rf.setObject(content.getNewValues());
 				String classDateFieldName = rf.getFieldNameFromAnnotation(rf.getObject(), 
 						JsonProperty.class, sdd.getFieldName());
