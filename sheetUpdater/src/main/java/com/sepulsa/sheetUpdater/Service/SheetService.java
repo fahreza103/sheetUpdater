@@ -238,6 +238,13 @@ public class SheetService {
     	return rowValues;
     }
     
+    private String getRangeFromSheetDefinition(SheetDefinition sheetDefinition, Integer startRow) {
+    	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
+    	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
+    	String readRange = sheetName+"!A"+startRow+":"+endColumn;
+    	return readRange;
+    }
+    
     private List<Object> fillColumnValue(List<SheetDefinitionDetail> sheetDefinitionDetails, List<Object> colList, WebHook webHook) {
         ReflectionUtil rf = new ReflectionUtil(webHook);
         List<Content> changes = webHook.getChanges();
@@ -279,15 +286,13 @@ public class SheetService {
     }
     
     private UpdateValuesResponse writeHeader (Sheets service, SheetDefinition sheetDefinition) throws IOException {
-    	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailList();
-    	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
-    	String readRange = sheetName+"!A1:"+endColumn;
+    	String readRange = getRangeFromSheetDefinition(sheetDefinition,1);
     	
         List<List<Object>> rowValues = getRangeValues(service, readRange);
         // if size == 0 , the header not write in the sheet
         if(rowValues.size() == 0) {
         	List<Object> colValues = new ArrayList<Object>();
-        	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
+        	for(SheetDefinitionDetail sdd : sheetDefinition.getSheetDefinitionDetailListSorted()) {
         		colValues.add(sdd.getViewName());
         	}
         	rowValues.add(colValues);
@@ -304,8 +309,7 @@ public class SheetService {
     	writeHeader(service, sheetDefinition);
     	
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
-    	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
-    	String readRange = sheetName+"!A2:"+endColumn;
+    	String readRange = getRangeFromSheetDefinition(sheetDefinition, 2);
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
         List<List<Object>> rowValues = getRangeValues(service, readRange);
@@ -353,60 +357,11 @@ public class SheetService {
         writeToSheet(service,readRange,rowValues);
     	
     }
-    
-    public void updateStory(WebHook webHook) throws IOException {
-    	Sheets service = getSheetsService();
-        String readRange = sheetName+"!A2:F";
-        List<List<Object>> rowValues = getRangeValues(service, readRange);
-    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
-    	
-    	Content storyChanges = getStoryChanges(webHook.getChanges());
- 
-    	String storyId = webHook.getPrimaryResources().get(0).getId();
-    	String storyName= webHook.getPrimaryResources().get(0).getName();
-    	String currentState = storyChanges.getNewValues().getCurrentState();
-    	String description = storyChanges.getNewValues().getDescription();
-    	String message = webHook.getMessage();
-    	Long updateDateStr =  storyChanges.getNewValues().getUpdatedAt(); 
-    	
-    	// Get story id from map
-    	SheetRowValues updatedStory = rowValuesMap.get(storyId);
-    	// Get the old values
-    	List<Object> colValues = updatedStory.getColListValues();
-    	log.info("OLD VALUES : "+colValues);
-    	// Update the values
-    	colValues.set(1, storyName);
-    	if(currentState != null) {
-    		colValues.set(2, currentState);
-    	}
-    	if(description != null) {
-    		colValues.set(3, description);
-    	}
-    	if(message != null) {
-    		colValues.set(4, message);
-    	}
-    	if(updateDateStr != null) {
-    		Date updateDate = new Date(storyChanges.getNewValues().getUpdatedAt());
-    		colValues.set(5,DateTool.getDateDMY(updateDate));
-    	}
-    	log.info("NEW VALUES : "+colValues);
-    	// Update the values
-    	updatedStory.setColListValues(colValues);
-    	rowValues.set(updatedStory.getRowNum(), colValues);
-    	rowValuesMap.put(storyId, updatedStory);
-    	// if there is an update to start the project, this story will move to the top
-    	rowValues = moveStory(webHook, rowValues, rowValuesMap);
-    	    	
-    	writeToSheet(service,readRange,rowValues);
-
-    	
-    }
-    
 
     
-    public void moveStory(WebHook webHook) throws IOException {
+    public void moveStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
     	Sheets service = getSheetsService();
-        String readRange = sheetName+"!A2:F";
+        String readRange =  getRangeFromSheetDefinition(sheetDefinition, 2);
         List<List<Object>> rowValues = getRangeValues(service, readRange);
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
 
