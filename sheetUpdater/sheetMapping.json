@@ -25,8 +25,12 @@
     "fieldName" : "estimate",
     "column" : "F"
   },{
+    "viewName" : "Labels",
+    "fieldName" : "labels",
+    "column" : "G"
+  },{
     "viewName" : "Update Time",
     "fieldName" : "updated_at",
-    "column" : "G"
+    "column" : "H"
   }  ]
 }
