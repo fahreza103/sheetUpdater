@@ -1,4 +1,4 @@
-package com.sepulsa.sheetUpdater.Service;
+package com.sepulsa.sheetUpdater.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +31,14 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.sepulsa.sheetUpdater.Object.Content;
-import com.sepulsa.sheetUpdater.Object.SheetDefinition;
-import com.sepulsa.sheetUpdater.Object.SheetDefinitionDetail;
-import com.sepulsa.sheetUpdater.Object.SheetRowValues;
-import com.sepulsa.sheetUpdater.Object.WebHook;
 import com.sepulsa.sheetUpdater.constant.AppConstant;
+import com.sepulsa.sheetUpdater.entity.Sheet;
+import com.sepulsa.sheetUpdater.object.Content;
+import com.sepulsa.sheetUpdater.object.SheetDefinition;
+import com.sepulsa.sheetUpdater.object.SheetDefinitionDetail;
+import com.sepulsa.sheetUpdater.object.SheetRowValues;
+import com.sepulsa.sheetUpdater.object.WebHook;
+import com.sepulsa.sheetUpdater.repository.SheetRepository;
 import com.sepulsa.sheetUpdater.util.DateTool;
 import com.sepulsa.sheetUpdater.util.ReflectionUtil;
 import com.sepulsa.sheetUpdater.util.StringTool;
@@ -43,6 +46,13 @@ import com.sepulsa.sheetUpdater.util.StringTool;
 @Component
 public class SheetService {
 	private Logger log = Logger.getLogger(SheetService.class);
+	
+	/** Sheet repository */
+	@Autowired
+	private SheetRepository sheetRepo;
+	
+	@Autowired
+	private JsonService jsonService;
 	
     /** Application name. */
     private static final String APPLICATION_NAME =
@@ -63,12 +73,6 @@ public class SheetService {
     private static HttpTransport HTTP_TRANSPORT;
     
     private Sheets sheet;
-    
-    private static final int DEFAULT_PORT = 8181;
-    
-    private static final String KIND_STORY = "story";
-    
-
     
     @Value("${server.port}")
     private String appPort;
@@ -104,10 +108,10 @@ public class SheetService {
      */
     public  Credential authorize() throws IOException {
     	
-    	log.info("Default Port :"+DEFAULT_PORT);
+    	log.info("Default Port :"+AppConstant.DEFAULT_PORT);
     	if(appPort == null || "-1".equals(appPort)) {
     		log.info("appPort is empty or -1, use default port instead");
-    		appPort = Integer.toString(DEFAULT_PORT);
+    		appPort = Integer.toString(AppConstant.DEFAULT_PORT);
     	}
     	
         // Load client secrets.
@@ -178,7 +182,7 @@ public class SheetService {
     private Content getStoryChanges(List<Content> changes) {      
         // search changes with kind story
         for(Content change : changes) {
-        	if(KIND_STORY.equals(change.getKind())) {
+        	if(AppConstant.KIND_STORY.equals(change.getKind())) {
         		return change;
         	}
         }        
@@ -239,10 +243,14 @@ public class SheetService {
     	return rowValues;
     }
     
-    private String getRangeFromSheetDefinition(SheetDefinition sheetDefinition, Integer startRow) {
+    private String getRangeFromSheetDefinition(SheetDefinition sheetDefinition, Integer startRow,Boolean allRow) {
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
     	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
     	String readRange = sheetName+"!A"+startRow+":"+endColumn;
+    	if(!allRow) {
+    		// example , A1:F1 , only row 1
+    		readRange += startRow;
+    	}
     	return readRange;
     }
     
@@ -257,7 +265,9 @@ public class SheetService {
     	for(SheetDefinitionDetail sdd : sheetDefinitionDetails) {
 			if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_PRIMARY_RES)) {
 				rf.setObject(webHook.getPrimaryResources().get(0));
-			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_MAIN)) {
+			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_PROJECT)) {
+				rf.setObject(webHook.getProject());
+			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_MAIN)) {			
 				rf.setObject(webHook);
 			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_DATETIME)) {
 				rf.setObject(content.getNewValues());
@@ -267,6 +277,7 @@ public class SheetService {
 					Date insertDate = new Date((Long)rf.getFieldValue(classDateFieldName));
 				    date = StringTool.replaceEmpty(DateTool.getDateDMYHHMM(insertDate),"-");
 				}
+			// GLobally on NEW VALUES
 			} else {
 				rf.setObject(content.getNewValues());
 			}
@@ -293,20 +304,49 @@ public class SheetService {
     	return colList;
     }
     
-    private UpdateValuesResponse writeHeader (Sheets service, SheetDefinition sheetDefinition) throws IOException {
-    	String readRange = getRangeFromSheetDefinition(sheetDefinition,1);
+    
+    private Boolean writeCheckEmptyHeader (Sheets service, SheetDefinition sheetDefinition) throws IOException {
+    	String readRange = getRangeFromSheetDefinition(sheetDefinition,1,false);
     	
-        List<List<Object>> rowValues = getRangeValues(service, readRange);
-        // if size == 0 , the header not write in the sheet
-        if(rowValues.size() == 0) {
+        if(sheetDefinition.getSheetIsEmpty()) {
+            List<List<Object>> rowValues = new ArrayList<List<Object>>();
         	List<Object> colValues = new ArrayList<Object>();
         	for(SheetDefinitionDetail sdd : sheetDefinition.getSheetDefinitionDetailListSorted()) {
         		colValues.add(sdd.getViewName());
         	}
         	rowValues.add(colValues);
-        	return writeToSheet(service, readRange, rowValues);
+        	writeToSheet(service, readRange, rowValues);
+        	return true;
         }
-        return null;
+        return false;
+    }
+    
+    public SheetDefinition getCurrentSheetDefinition(String sheetMappingJson) throws IOException {
+    	Sheet sheet = sheetRepo.findOne(new Long(1));
+    	// Save if empty
+    	if(sheet == null) {
+    		sheet = new Sheet();
+    		sheet.setId(new Long(1));
+    		sheet.setSheetId(spreadSheetId);
+    		sheet.setStructure(sheetMappingJson);
+    		sheetRepo.save(sheet);
+    	}
+    	
+    	Sheets service = getSheetsService();
+        List<List<Object>> rowValues = getRangeValues(service, "!A1:B1");
+    	
+    	// Update if different, it means there's change in the sheetMapping.json
+    	// and sheet must be empty, if not, nothing changed
+    	if(!sheetMappingJson.equals(sheet.getStructure()) && rowValues.isEmpty()) {
+    		sheet.setStructure(sheetMappingJson);
+    		sheetRepo.save(sheet);
+    	} 
+    	
+    	SheetDefinition sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
+    	if(rowValues.isEmpty()) {
+    		sd.setSheetIsEmpty(true);
+    	}
+    	return sd;
     }
     
     public void addUpdateStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
@@ -314,10 +354,10 @@ public class SheetService {
     	Sheets service = getSheetsService();
     	
     	// Write header if not yet write in sheet
-    	writeHeader(service, sheetDefinition);
+    	writeCheckEmptyHeader(service, sheetDefinition);
     	
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
-    	String readRange = getRangeFromSheetDefinition(sheetDefinition, 2);
+    	String readRange = getRangeFromSheetDefinition(sheetDefinition, 2,true);
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
         List<List<Object>> rowValues = getRangeValues(service, readRange);
@@ -369,7 +409,7 @@ public class SheetService {
     
     public void moveStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
     	Sheets service = getSheetsService();
-        String readRange =  getRangeFromSheetDefinition(sheetDefinition, 2);
+        String readRange =  getRangeFromSheetDefinition(sheetDefinition, 2,true);
         List<List<Object>> rowValues = getRangeValues(service, readRange);
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
 

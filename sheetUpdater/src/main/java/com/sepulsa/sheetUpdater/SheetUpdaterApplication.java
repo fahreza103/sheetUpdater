@@ -6,8 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import com.google.api.services.sheets.v4.Sheets;
-import com.sepulsa.sheetUpdater.Service.SheetService;
+
+import com.sepulsa.sheetUpdater.service.SheetService;
 
 @SpringBootApplication
 @ComponentScan("com.sepulsa")
@@ -17,7 +17,7 @@ public class SheetUpdaterApplication {
 		// Build a new authorized API client service.
 		try {
 			SheetService sheetService = new SheetService();
-			Sheets service = sheetService.getSheetsService();
+			sheetService.getSheetsService();
 			SpringApplication.run(SheetUpdaterApplication.class, args);
 		} catch (IOException e) {
 			e.printStackTrace();

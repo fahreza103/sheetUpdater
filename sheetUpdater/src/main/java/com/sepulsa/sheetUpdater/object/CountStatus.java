@@ -1,4 +1,4 @@
-package com.sepulsa.sheetUpdater.Object;
+package com.sepulsa.sheetUpdater.object;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 

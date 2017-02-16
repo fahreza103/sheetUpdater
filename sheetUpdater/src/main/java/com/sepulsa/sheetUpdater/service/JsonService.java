@@ -1,4 +1,4 @@
-package com.sepulsa.sheetUpdater.Service;
+package com.sepulsa.sheetUpdater.service;
 
 import java.io.IOException;
 
@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * Provide functionality to handle JSON operation, converting json string to object
  * or object to json string
+ * @Author Fahreza Tamara
  */
 @Component
 public class JsonService {
@@ -21,7 +22,7 @@ public class JsonService {
 	private Logger log = Logger.getLogger(JsonService.class);
 	
 	/**
-	 * Convert json string into WebHook Pojo 
+	 * Convert json string into Java object
 	 * @param <T> 
 	 * @param json string
 	 * @return WebHook Object

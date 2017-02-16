@@ -1,4 +1,4 @@
-package com.sepulsa.sheetUpdater.Object;
+package com.sepulsa.sheetUpdater.object;
 
 import java.io.Serializable;
 import java.util.ArrayList;

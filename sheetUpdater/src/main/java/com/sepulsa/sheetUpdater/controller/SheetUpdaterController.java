@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sepulsa.sheetUpdater.Object.SheetDefinition;
-import com.sepulsa.sheetUpdater.Object.WebHook;
-import com.sepulsa.sheetUpdater.Service.JsonService;
-import com.sepulsa.sheetUpdater.Service.SheetService;
 import com.sepulsa.sheetUpdater.constant.AppConstant;
+import com.sepulsa.sheetUpdater.object.SheetDefinition;
+import com.sepulsa.sheetUpdater.object.WebHook;
+import com.sepulsa.sheetUpdater.service.JsonService;
+import com.sepulsa.sheetUpdater.service.SheetService;
 import com.sepulsa.sheetUpdater.util.FileTool;
 
 @RestController
@@ -35,6 +35,7 @@ public class SheetUpdaterController {
 		return "OK";
 	}
 	
+	
 	@RequestMapping(value = "/webHookListener")
 	public String webHookListener (@RequestBody String json) throws IOException {
 		// Convert to JSON from string requestBody
@@ -42,7 +43,7 @@ public class SheetUpdaterController {
 		// Read sheetMapping.json (mapping column configuration)
 		String sheetMappingJson = FileTool.getStrFileContent(AppConstant.SHEET_MAPPING_FILE);
 		// Convert to JSON
-		SheetDefinition sheetDefinition = jsonService.convertToObject(sheetMappingJson,SheetDefinition.class);
+		SheetDefinition sheetDefinition = sheetService.getCurrentSheetDefinition(sheetMappingJson);
 		
 		// Get kind (activity by user in pivotal)
 		String kind = webHook.getKind();

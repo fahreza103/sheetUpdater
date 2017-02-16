@@ -1,4 +1,4 @@
-package com.sepulsa.sheetUpdater.Object;
+package com.sepulsa.sheetUpdater.object;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ public class SheetDefinition implements Serializable {
 	private String id;
 	@JsonProperty("mapping")
 	private List<SheetDefinitionDetail> sheetDefinitionDetailList = new ArrayList<SheetDefinitionDetail>();
+	private Boolean sheetIsEmpty = false;
 	
 	public String getId() {
 		return id;
@@ -38,6 +39,13 @@ public class SheetDefinition implements Serializable {
 	public SheetDefinition setSheetDefinitionDetailList(List<SheetDefinitionDetail> sheetDefinitionDetailList) {
 		this.sheetDefinitionDetailList = sheetDefinitionDetailList;
 		return this;
+	}
+	
+	public Boolean getSheetIsEmpty() {
+		return sheetIsEmpty;
+	}
+	public void setSheetIsEmpty(Boolean sheetIsEmpty) {
+		this.sheetIsEmpty = sheetIsEmpty;
 	}
 	
 	public List<SheetDefinitionDetail> sortByColumn() {
