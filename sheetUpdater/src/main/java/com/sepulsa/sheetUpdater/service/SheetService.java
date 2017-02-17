@@ -317,7 +317,7 @@ public class SheetService {
     }
     
     public SheetDefinition getCurrentSheetDefinition(String sheetMappingJson) throws IOException {
-    	Sheet sheet = sheetRepo.findOne(new Long(1));
+    	Sheet sheet = sheetRepo.findById(new Long(1));
     	SheetDefinition sd = null;
     	// Save if empty
     	if(sheet == null) {

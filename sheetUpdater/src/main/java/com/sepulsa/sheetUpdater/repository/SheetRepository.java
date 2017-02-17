@@ -8,5 +8,6 @@ import com.sepulsa.sheetUpdater.entity.Sheet;
 @Repository
 public interface SheetRepository extends JpaRepository<Sheet, Long> {
 
+	public Sheet findById(Long id);
 	public Sheet findBySheetId(String sheetId);
 }
