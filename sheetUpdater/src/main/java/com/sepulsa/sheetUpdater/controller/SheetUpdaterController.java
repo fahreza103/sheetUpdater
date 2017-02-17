@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.sepulsa.sheetUpdater.constant.AppConstant;
+import com.sepulsa.sheetUpdater.object.ApiResponse;
 import com.sepulsa.sheetUpdater.object.SheetDefinition;
 import com.sepulsa.sheetUpdater.object.WebHook;
 import com.sepulsa.sheetUpdater.service.JsonService;
@@ -37,24 +39,38 @@ public class SheetUpdaterController {
 	
 	
 	@RequestMapping(value = "/webHookListener")
-	public String webHookListener (@RequestBody String json) throws IOException {
+	public ApiResponse webHookListener (@RequestBody String json) {
 		// Convert to JSON from string requestBody
 		WebHook webHook = jsonService.convertToObject(json,WebHook.class);
 		// Read sheetMapping.json (mapping column configuration)
 		String sheetMappingJson = FileTool.getStrFileContent(AppConstant.SHEET_MAPPING_FILE);
-		// Convert to JSON
-		SheetDefinition sheetDefinition = sheetService.getCurrentSheetDefinition(sheetMappingJson);
+		// create response
+		ApiResponse apiResponse = new ApiResponse();
+		try {
+			// Convert to JSON
+			SheetDefinition sheetDefinition = sheetService.getCurrentSheetDefinition(sheetMappingJson);
+			// Get kind (activity by user in pivotal)
+			String kind = webHook.getKind();
+			UpdateValuesResponse response = null;
+			if (AppConstant.ACTIVITY_CREATE.equals(kind) || AppConstant.ACTIVITY_UPDATE.equals(kind)) {
+				response = sheetService.addUpdateStory(webHook, sheetDefinition);
+			} else if (AppConstant.ACTIVITY_MOVE.equals(kind)) {
+				response = sheetService.moveStory(webHook, sheetDefinition);
+			} 
+			
+			apiResponse.setStatus(1);
+			apiResponse.setMessage("SUCESS");
+			apiResponse.setSpreadsheetId(response.getSpreadsheetId());
+			apiResponse.setUpdatedCells(response.getUpdatedCells());
+			apiResponse.setUpdatedColumns(response.getUpdatedColumns());
+			apiResponse.setUpdatedRange(response.getUpdatedRange());
+		} catch (Exception e) {
+			e.printStackTrace();
+			apiResponse.setStatus(0);
+			apiResponse.setMessage("FAILED, REASON : "+e.getMessage());
+		}
 		
-		// Get kind (activity by user in pivotal)
-		String kind = webHook.getKind();
-		
-		if(AppConstant.ACTIVITY_CREATE.equals(kind) || AppConstant.ACTIVITY_UPDATE.equals(kind)) {
-			sheetService.addUpdateStory(webHook,sheetDefinition);
-		} else if (AppConstant.ACTIVITY_MOVE.equals(kind)) {
-			sheetService.moveStory(webHook,sheetDefinition);
-		} 
-	  
-		return json;
+		return apiResponse;
 	}
 
 }

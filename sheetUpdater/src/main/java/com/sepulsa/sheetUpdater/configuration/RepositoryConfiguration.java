@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackages = {"com.sepulsa.sheetUpdater.entity"})
-@EnableJpaRepositories(basePackages = {"com.sepulsa.sheetUpdater.repository"})
 @EnableTransactionManagement
 public class RepositoryConfiguration {
     @Bean

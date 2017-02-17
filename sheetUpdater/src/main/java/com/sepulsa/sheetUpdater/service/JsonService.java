@@ -39,11 +39,7 @@ public class JsonService {
 			T jsobObj = (T) mapper.readValue(json, clazz);
 
 			return (T) jsobObj;
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;

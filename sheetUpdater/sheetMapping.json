@@ -1,5 +1,6 @@
 {
-  "idField": "id",
+  "spreadSheetId": "1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI",
+  "spreadSheetName":"TestSheet",
   "mapping": [{
   	"viewName" : "Story Name",
     "fieldName" : "name",

@@ -77,11 +77,6 @@ public class SheetService {
     @Value("${server.port}")
     private String appPort;
     
-    @Value("${spreadsheet.id}")
-    private String spreadSheetId;
-    
-    @Value("${spreadsheet.sheet.name}")
-    private String sheetName;
 
     /** Global instance of the scopes required by this quickstart.
      *
@@ -155,7 +150,7 @@ public class SheetService {
     	return sheet;
     }
     
-    private  List<List<Object>> getRangeValues(Sheets service , String range) throws IOException {
+    private  List<List<Object>> getRangeValues(Sheets service , String spreadSheetId, String range) throws IOException {
         ValueRange response = service.spreadsheets().values()
                 .get(spreadSheetId, range)
                 .execute();
@@ -189,7 +184,7 @@ public class SheetService {
         return null;
     }
     
-    private UpdateValuesResponse writeToSheet(Sheets service, String writeRange, List<List<Object>> rowValues) throws IOException {
+    private UpdateValuesResponse writeToSheet(Sheets service,String spreadSheetId, String writeRange, List<List<Object>> rowValues) throws IOException {
         ValueRange vr = new ValueRange().setValues(rowValues).setMajorDimension("ROWS");
         return service.spreadsheets().values()
                 .update(spreadSheetId, writeRange, vr)
@@ -246,7 +241,7 @@ public class SheetService {
     private String getRangeFromSheetDefinition(SheetDefinition sheetDefinition, Integer startRow,Boolean allRow) {
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
     	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
-    	String readRange = sheetName+"!A"+startRow+":"+endColumn;
+    	String readRange = sheetDefinition.getSpreadSheetName()+"!A"+startRow+":"+endColumn;
     	if(!allRow) {
     		// example , A1:F1 , only row 1
     		readRange += startRow;
@@ -315,7 +310,7 @@ public class SheetService {
         		colValues.add(sdd.getViewName());
         	}
         	rowValues.add(colValues);
-        	writeToSheet(service, readRange, rowValues);
+        	writeToSheet(service, sheetDefinition.getSpreadSheetId(), readRange, rowValues);
         	return true;
         }
         return false;
@@ -323,18 +318,22 @@ public class SheetService {
     
     public SheetDefinition getCurrentSheetDefinition(String sheetMappingJson) throws IOException {
     	Sheet sheet = sheetRepo.findOne(new Long(1));
+    	SheetDefinition sd = null;
     	// Save if empty
     	if(sheet == null) {
+    		sd = jsonService.convertToObject(sheetMappingJson, SheetDefinition.class);
     		log.info("Sheet is empty, insert into db");
     		sheet = new Sheet();
     		sheet.setId(new Long(1));
-    		sheet.setSheetId(spreadSheetId);
+    		sheet.setSheetId(sd.getSpreadSheetId());
     		sheet.setStructure(sheetMappingJson);
     		sheetRepo.save(sheet);
+    	} else {
+        	sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
     	}
     	
     	Sheets service = getSheetsService();
-        List<List<Object>> rowValues = getRangeValues(service, "!A1:B1");
+        List<List<Object>> rowValues = getRangeValues(service, sd.getSpreadSheetId(), "!A1:B1");
     	
     	// Update if different, it means there's change in the sheetMapping.json
     	// and sheet must be empty, if not, nothing changed
@@ -342,16 +341,17 @@ public class SheetService {
     		log.info("Header is empty and there's change in sheetMapping.json file");
     		sheet.setStructure(sheetMappingJson);
     		sheetRepo.save(sheet);
+    		
+        	sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
     	} 
     	
-    	SheetDefinition sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
     	if(rowValues.isEmpty()) {
     		sd.setSheetIsEmpty(true);
     	}
     	return sd;
     }
     
-    public void addUpdateStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
+    public UpdateValuesResponse addUpdateStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
     	String kind = webHook.getKind();
     	Sheets service = getSheetsService();
     	
@@ -362,7 +362,7 @@ public class SheetService {
     	String readRange = getRangeFromSheetDefinition(sheetDefinition, 2,true);
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
-        List<List<Object>> rowValues = getRangeValues(service, readRange);
+        List<List<Object>> rowValues = getRangeValues(service, sheetDefinition.getSpreadSheetId(), readRange);
         List<Content> changes = webHook.getChanges();
         List<Object> colList = null;
         
@@ -404,19 +404,19 @@ public class SheetService {
         }
 
 
-        writeToSheet(service,readRange,rowValues);
+        return writeToSheet(service,sheetDefinition.getSpreadSheetId(),readRange,rowValues);
     	
     }
 
     
-    public void moveStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
+    public UpdateValuesResponse moveStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
     	Sheets service = getSheetsService();
         String readRange =  getRangeFromSheetDefinition(sheetDefinition, 2,true);
-        List<List<Object>> rowValues = getRangeValues(service, readRange);
+        List<List<Object>> rowValues = getRangeValues(service, sheetDefinition.getSpreadSheetId(),readRange);
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
 
     	rowValues = moveStory(webHook, rowValues, rowValuesMap);
-    	writeToSheet(service,readRange,rowValues);
+    	return writeToSheet(service,sheetDefinition.getSpreadSheetId(),readRange,rowValues);
     }
     
     public static void main(String[] args) throws IOException {

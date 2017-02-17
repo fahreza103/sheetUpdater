@@ -14,19 +14,31 @@ public class SheetDefinition implements Serializable {
 
 	private static final long serialVersionUID = 7554929770692931112L;
 	
-	@JsonProperty("idField")
-	private String id;
+	@JsonProperty("spreadSheetId")
+	private String spreadSheetId;
+	@JsonProperty("spreadSheetName")
+	private String spreadSheetName;
 	@JsonProperty("mapping")
 	private List<SheetDefinitionDetail> sheetDefinitionDetailList = new ArrayList<SheetDefinitionDetail>();
 	private Boolean sheetIsEmpty = false;
 	
-	public String getId() {
-		return id;
+
+	public String getSpreadSheetId() {
+		return spreadSheetId;
 	}
-	public SheetDefinition setId(String id) {
-		this.id = id;
-		return this;
+
+	public void setSpreadSheetId(String spreadSheetId) {
+		this.spreadSheetId = spreadSheetId;
 	}
+
+	public String getSpreadSheetName() {
+		return spreadSheetName;
+	}
+
+	public void setSpreadSheetName(String spreadSheetName) {
+		this.spreadSheetName = spreadSheetName;
+	}
+
 	public List<SheetDefinitionDetail> getSheetDefinitionDetailList() {
 		return sheetDefinitionDetailList;
 	}
