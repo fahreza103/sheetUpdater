@@ -1,0 +1,21 @@
+language: java
+sudo: false
+
+jdk:
+- oraclejdk8
+
+before_install:
+  - chmod +x mvnw
+
+install:
+- mvn -N io.takari:maven:wrapper
+- ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+script: "mvn cobertura:cobertura"
+
+notifications:
+  email:
+    recipients:
+      - fahreza.tamara@gmail.com
+    on_success: always
+    on_failure: always
