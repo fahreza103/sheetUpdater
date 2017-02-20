@@ -37,7 +37,7 @@ public class JsonService {
 
 			return (T) jsobObj;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug("ERROR CONVERTING TO OBJECT : "+e.getMessage());
 		}
 		return null;
 	}
