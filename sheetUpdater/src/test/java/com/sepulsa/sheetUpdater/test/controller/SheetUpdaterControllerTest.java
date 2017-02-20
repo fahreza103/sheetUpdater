@@ -1,44 +1,37 @@
 package com.sepulsa.sheetUpdater.test.controller;
 
-import static org.junit.Assert.assertEquals;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Matchers.any;
+
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.test.context.web.AnnotationConfigWebContextLoader;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.sepulsa.sheetUpdater.SheetUpdaterApplication;
-import com.sepulsa.sheetUpdater.configuration.RepositoryConfiguration;
-import com.sepulsa.sheetUpdater.controller.SheetUpdaterController;
-import com.sepulsa.sheetUpdater.entity.Sheet;
-import com.sepulsa.sheetUpdater.repository.SheetRepository;
+import com.sepulsa.sheetUpdater.constant.AppConstant;
+import com.sepulsa.sheetUpdater.object.WebHook;
+import com.sepulsa.sheetUpdater.service.JsonService;
 import com.sepulsa.sheetUpdater.service.SheetService;
+import com.sepulsa.sheetUpdater.util.FileTool;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -48,9 +41,30 @@ public class SheetUpdaterControllerTest {
 	
 	@Autowired
 	private MockMvc mockMvc;
+	@Autowired
+	private JsonService jsonService;
 	
 	@MockBean
 	private SheetService sheetService;
+	
+	public WebHook webHook;
+	public String jsonRequest;
+	public String jsonSheetMapping;
+	
+	@Before
+	public void setUp() {
+		this.jsonRequest = FileTool.getStrFileContent("dummyRequest.json");
+		this.jsonSheetMapping = FileTool.getStrFileContent("sheetMapping.json");
+		
+		WebHook webHook = jsonService.convertToObject(jsonRequest, WebHook.class);
+		this.webHook = webHook;
+	}
+	
+	@Test
+	public void testMockCreation() {
+		assertNotNull(mockMvc);
+		assertNotNull(sheetService);
+	}
 
     @Test
     public void testCallback() throws Exception {
@@ -60,15 +74,41 @@ public class SheetUpdaterControllerTest {
     }
     
     @Test
-    public void testWebHookListener() throws Exception {
+    public void testWebHookListenerAddUpdateStory() throws Exception {
+    	
         ResultActions result = this.mockMvc.perform(post("/webHookListener")
-        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")));
+        .contentType(MediaType.APPLICATION_JSON_UTF8).content(jsonRequest));
+        
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        verify(sheetService).getCurrentSheetDefinition(argument.capture());
+        assertNotNull(argument.getValue());
+        
+        verify(sheetService,times(1)).addUpdateStory(any(),any());
+        
         result.andExpect(status().isOk());
-        result.andExpect(content().contentType("application/json"));
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        result.andReturn();
+    }
+    
+    @Test
+    public void testWebHookListenerMoveStory() throws Exception {
+    	String jsonRequestMove = jsonRequest.replace(AppConstant.ACTIVITY_CREATE,AppConstant.ACTIVITY_MOVE);
+    	
+        ResultActions result = this.mockMvc.perform(post("/webHookListener")
+        .contentType(MediaType.APPLICATION_JSON_UTF8).content(jsonRequestMove));
+        
+        verify(sheetService,times(1)).moveStory(any(), any());
+        
+        result.andExpect(status().isOk());
+        result.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        result.andReturn();
     }
     
     @After
     public void tearDown() {
     	this.mockMvc = null;
+    	this.jsonRequest = null;
+    	this.jsonService = null;
+    	this.sheetService = null;
     }
 }

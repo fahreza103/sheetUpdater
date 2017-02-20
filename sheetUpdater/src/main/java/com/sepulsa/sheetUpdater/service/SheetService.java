@@ -403,9 +403,10 @@ public class SheetService {
         	rowValues = moveStory(webHook, rowValues, rowValuesMap);
         }
 
-
-        return writeToSheet(service,sheetDefinition.getSpreadSheetId(),readRange,rowValues);
-    	
+        log.info("Write to spreadsheetId" +sheetDefinition.getSpreadSheetId()+" readRange : "+readRange);
+        UpdateValuesResponse response = writeToSheet(service,sheetDefinition.getSpreadSheetId(),readRange,rowValues);
+        log.info("response : "+response);
+    	return response;
     }
 
     

@@ -53,8 +53,10 @@ public class SheetUpdaterController {
 			String kind = webHook.getKind();
 			UpdateValuesResponse response = null;
 			if (AppConstant.ACTIVITY_CREATE.equals(kind) || AppConstant.ACTIVITY_UPDATE.equals(kind)) {
+				log.info("Perform add / update sheet");
 				response = sheetService.addUpdateStory(webHook, sheetDefinition);
 			} else if (AppConstant.ACTIVITY_MOVE.equals(kind)) {
+				log.info("Perform move position");
 				response = sheetService.moveStory(webHook, sheetDefinition);
 			} 
 			
@@ -65,7 +67,7 @@ public class SheetUpdaterController {
 			apiResponse.setUpdatedColumns(response.getUpdatedColumns());
 			apiResponse.setUpdatedRange(response.getUpdatedRange());
 		} catch (Exception e) {
-			e.printStackTrace();
+
 			apiResponse.setStatus(0);
 			apiResponse.setMessage("FAILED, REASON : "+e.getMessage());
 		}

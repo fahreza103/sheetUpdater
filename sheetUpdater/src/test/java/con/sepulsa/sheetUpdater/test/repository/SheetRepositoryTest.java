@@ -9,15 +9,16 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
-
+import com.sepulsa.sheetUpdater.SheetUpdaterApplication;
 import com.sepulsa.sheetUpdater.entity.Sheet;
 import com.sepulsa.sheetUpdater.repository.SheetRepository;
 
 
 @RunWith(SpringRunner.class)
+@ContextConfiguration(classes={SheetUpdaterApplication.class})
 @DataJpaTest
 public class SheetRepositoryTest {
 	
@@ -38,19 +39,7 @@ public class SheetRepositoryTest {
         assertEquals("testSheetId", result.getSheetId());
     }
     
-    
-//    @Test
-//    public void contextLoads() {}
-//
-//    @Test
-//    public void testSheetUpdate() throws Exception {
-//        ResultActions result = this.mockMvc.perform(get("/Callback"));
-//        //result.accept(MediaType.parseMediaType("application/json;charset=UTF-8"));
-//        result.andExpect(status().isOk());
-//        //result.andExpect(content().contentType("application/json"));
-//
-//    }
-    
+
     @After
     public void tearDown() {
     	this.em = null;
