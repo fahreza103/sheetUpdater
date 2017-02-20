@@ -74,9 +74,4 @@ public class StringTool {
 		return StringUtils.join(collection,delimiter);
 	}
 	
-	public static void main (String[] args) {
-		List<String> list = new ArrayList<String>();
-		list.add("s");
-		System.out.println(StringUtils.join(list,","));
-	}
 }

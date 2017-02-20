@@ -25,7 +25,7 @@ public class FileTool {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.debug("#######ERROR :"+e.getMessage()+" \nCAUSED : "+e.getCause());
 		}
 		return content;
 	}
