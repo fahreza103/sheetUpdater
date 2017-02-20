@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
- * Provide functionality to handle JSON operation, converting json string to object
+ * Provide functionality to handle JSON operation, converting JSON string to object
  * or object to json string
  * @Author Fahreza Tamara
  */
