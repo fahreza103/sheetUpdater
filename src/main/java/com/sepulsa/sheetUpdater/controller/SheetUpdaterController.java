@@ -20,7 +20,7 @@ import com.sepulsa.sheetUpdater.service.SheetService;
 import com.sepulsa.sheetUpdater.util.FileTool;
 
 /**
- * Controller for endpoint
+ * Controller for endpoint, listen to webhook trigger
  * @author Fahreza Tamara
  *
  */
