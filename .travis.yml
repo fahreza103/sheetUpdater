@@ -14,13 +14,13 @@ install:
 - mvn -N io.takari:maven:wrapper
 - ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
-script: "mvn clean install"
+script: "mvn -B clean install"
 
 after_success:
   - eval "$(ssh-agent -s)"
   # deploy to development server
-  - chmod 600 develop.pem
-  - ssh-add develop.pem
+  - chmod 600 owl-dev.pem
+  - ssh-add owl-dev.pem
   - ssh-keygen -R $DEVELOPMENT_HOST
   - ssh-keyscan -H $DEVELOPMENT_HOST >> ~/.ssh/known_hosts
   - ssh -v -i develop.pem $DEVELOPMENT_SSH_USER@$DEVELOPMENT_HOST DEVELOPMENT_APP_PATH=$DEVELOPMENT_APP_PATH DEVELOPMENT_BRANCH=$DEVELOPMENT_BRANCH 'bash -s' < deploy-devel.sh
