@@ -19,6 +19,11 @@ import com.sepulsa.sheetUpdater.service.JsonService;
 import com.sepulsa.sheetUpdater.service.SheetService;
 import com.sepulsa.sheetUpdater.util.FileTool;
 
+/**
+ * Controller for endpoint
+ * @author Fahreza Tamara
+ *
+ */
 @RestController
 @EnableAutoConfiguration
 public class SheetUpdaterController {
