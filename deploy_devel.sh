@@ -11,4 +11,4 @@ git pull origin $DEVELOPMENT_BRANCH
 curl -X POST $DEVELOPMENT_HOST:$DEVELOPMENT_PORT/shutdown
 
 #START APPLICATION
-./mvn spring-boot:run
+mvn spring-boot:run
