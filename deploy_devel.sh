@@ -8,7 +8,7 @@ git checkout $DEVELOPMENT_BRANCH
 git pull origin $DEVELOPMENT_BRANCH
 
 #STOP APPLICATION
-curl -X POST $APP_HOST:$APP_PORT/shutdown
+curl -X POST $DEVELOPMENT_HOST:$DEVELOPMENT_PORT/shutdown
 
 #START APPLICATION
 mvn spring-boot:run
