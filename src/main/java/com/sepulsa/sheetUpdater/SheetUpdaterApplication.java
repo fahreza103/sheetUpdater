@@ -1,7 +1,6 @@
 package com.sepulsa.sheetUpdater;
 
 import java.io.IOException;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,10 +22,11 @@ public class SheetUpdaterApplication {
 		try {
 			SheetService sheetService = new SheetService();
 			sheetService.getSheetsService();
-			SpringApplication.run(SheetUpdaterApplication.class, args);
+		    SpringApplication.run(SheetUpdaterApplication.class, args);	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
 }
 	
