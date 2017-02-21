@@ -14,6 +14,12 @@ import com.sepulsa.sheetUpdater.util.StringTool;
 public class StringToolTest {
 
 	@Test
+	public void testConstructor() {
+		StringTool tool = new StringTool();
+		assertNotNull(tool);
+	}
+	
+	@Test
 	public void testIsEmpty() {
 		String a = null;
 		String b = "";

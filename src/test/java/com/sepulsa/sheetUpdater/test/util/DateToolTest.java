@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.sepulsa.sheetUpdater.util.DateTool;
 
+
 @RunWith(SpringRunner.class)
 public class DateToolTest {
 	
@@ -18,6 +19,8 @@ public class DateToolTest {
 	
 	@Test
 	public void testFormatDMY() {
+		DateTool tool = new DateTool();
+		assertNotNull(tool);
 		assertEquals("15/02/2017",DateTool.getDateDMY(calendar.getTime()));
 	}
 	

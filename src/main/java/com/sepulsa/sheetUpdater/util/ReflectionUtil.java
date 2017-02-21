@@ -4,8 +4,16 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.apache.log4j.Logger;
 
+/**
+ * Provide functionality to get class content, get the field, method, etc
+ * @author Fahreza tamara
+ *
+ */
 public class ReflectionUtil {
+	
+	private Logger log = Logger.getLogger(ReflectionUtil.class);
 	
 	private  Object object;
 	
@@ -28,7 +36,7 @@ public class ReflectionUtil {
 				} 
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug("####ERROR : "+e.getMessage()+" caused :"+e.getCause());
 		} 
 		return null;
 	}
@@ -40,19 +48,21 @@ public class ReflectionUtil {
 			field.setAccessible(true);
 			value = field.get(object);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug("####ERROR : "+e.getMessage()+" caused :"+e.getCause());
 		}
 		return value;
 	}
 	
-	public void setFieldValue (String fieldName, Object value) {
+	public Object setFieldValue (String fieldName, Object value) {
 		try {
 			Field field = object.getClass().getDeclaredField(fieldName);    
 			field.setAccessible(true);
 			field.set(object,value);
+			return field.getName();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug("####ERROR : "+e.getMessage()+" caused :"+e.getCause());
 		}
+		return null;
 	}
 
 	public Object getObject() {
