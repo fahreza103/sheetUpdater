@@ -39,6 +39,7 @@ public class SheetUpdaterController {
 	
 	@RequestMapping("/Callback")
 	public String callBack () throws IOException {
+		log.info("callback");
 		return "OK";
 	}
 	
