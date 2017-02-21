@@ -11,9 +11,9 @@ before_script:
 - openssl aes-256-cbc -K $encrypted_32c60f8c357d_key -iv $encrypted_32c60f8c357d_iv -in owl-dev.pem.enc -out owl-dev.pem -d
 
 install:
-- mvn -N io.takari:maven:wrapper
+- mvn -N -q io.takari:maven:wrapper
 
-script: "mvn -B -V clean install"
+script: "mvn -q -B -V clean install"
 
 after_success:
   - eval "$(ssh-agent -s)"
