@@ -1,6 +1,8 @@
 package com.sepulsa.sheetUpdater.object;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApiResponse implements Serializable {
 
@@ -12,7 +14,8 @@ public class ApiResponse implements Serializable {
 	private String spreadsheetId;
 	private Integer updatedColumns;
 	private Integer updatedCells;
-	
+	private Integer updatedRows;
+	private List<List<Object>> updatedData = new ArrayList<List<Object>>();
 	
 	public Integer getStatus() {
 		return status;
@@ -49,6 +52,18 @@ public class ApiResponse implements Serializable {
 	}
 	public void setUpdatedCells(Integer updatedCells) {
 		this.updatedCells = updatedCells;
+	}
+	public Integer getUpdatedRows() {
+		return updatedRows;
+	}
+	public void setUpdatedRows(Integer updatedRows) {
+		this.updatedRows = updatedRows;
+	}
+	public List<List<Object>> getUpdatedData() {
+		return updatedData;
+	}
+	public void setUpdatedData(List<List<Object>> updatedData) {
+		this.updatedData = updatedData;
 	}
 	
 	

@@ -3,6 +3,7 @@ package com.sepulsa.sheetUpdater.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.PrintWriter;
 
 import org.apache.log4j.Logger;
 
@@ -37,5 +38,15 @@ public class FileTool {
 			log.debug("#######ERROR :"+e.getMessage()+" \nCAUSED : "+e.getCause());
 		}
 		return content;
+	}
+	
+	public static void writeFile(String fileName, String content) {
+		try{
+		    PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+		    writer.println(content);
+		    writer.close();
+		} catch (Exception e) {
+			log.debug("#######ERROR :"+e.getMessage()+" \nCAUSED : "+e.getCause());
+		}
 	}
 }

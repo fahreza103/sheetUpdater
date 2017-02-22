@@ -59,8 +59,6 @@
         ],
         "created_at": 1487055796000,
         "updated_at": 1487055797000,
-        "before_id": 139645403,
-        "after_id": 139645397,
         "labels": [
           "api",
           "label"
@@ -265,7 +263,7 @@
   "primary_resources": [
     {
       "kind": "story",
-      "id": 139800563,
+      "id": 100000000,
       "name": "tes5",
       "story_type": "feature",
       "url": "https://www.pivotaltracker.com/story/show/139800563"

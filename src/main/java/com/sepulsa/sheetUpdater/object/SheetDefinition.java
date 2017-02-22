@@ -21,6 +21,7 @@ public class SheetDefinition implements Serializable {
 	@JsonProperty("mapping")
 	private List<SheetDefinitionDetail> sheetDefinitionDetailList = new ArrayList<SheetDefinitionDetail>();
 	private Boolean sheetIsEmpty = false;
+	private String startColumn;
 	
 
 	public String getSpreadSheetId() {
@@ -60,6 +61,14 @@ public class SheetDefinition implements Serializable {
 		this.sheetIsEmpty = sheetIsEmpty;
 	}
 	
+	public String getStartColumn() {
+		return startColumn;
+	}
+
+	public void setStartColumn(String startColumn) {
+		this.startColumn = startColumn;
+	}
+
 	public List<SheetDefinitionDetail> sortByColumn() {
 		Collections.sort(sheetDefinitionDetailList,new Comparator<SheetDefinitionDetail>() {
 

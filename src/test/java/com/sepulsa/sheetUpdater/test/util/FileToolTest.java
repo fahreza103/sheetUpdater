@@ -2,6 +2,7 @@ package com.sepulsa.sheetUpdater.test.util;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,5 +31,25 @@ public class FileToolTest {
 		// File not found
 		String fileContent = FileTool.getStrFileContent("noFile");
 		assertEquals("", fileContent);
+	}
+	
+	@Test
+	public void testWriteFile() {
+		String content = "test";
+		FileTool.writeFile("test.txt", content);
+		
+		File f = new File("test.txt");
+		assertTrue("file test.txt should exist", f.exists());
+		
+		f.delete();
+	}
+	
+	@Test
+	public void testFileNotExistIfExceptionOccured() {
+		String content = "test";
+		FileTool.writeFile(null, content);
+		
+		File f = new File("test.txt");
+		assertFalse("file test.txt shouldn't exist", f.exists());
 	}
 }

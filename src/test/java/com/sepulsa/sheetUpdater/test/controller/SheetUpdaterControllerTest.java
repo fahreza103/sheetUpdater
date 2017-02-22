@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
 
 
@@ -28,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.sepulsa.sheetUpdater.constant.AppConstant;
+import com.sepulsa.sheetUpdater.object.ApiResponse;
 import com.sepulsa.sheetUpdater.object.WebHook;
 import com.sepulsa.sheetUpdater.service.JsonService;
 import com.sepulsa.sheetUpdater.service.SheetService;
@@ -74,8 +77,17 @@ public class SheetUpdaterControllerTest {
     }
     
     @Test
-    public void testWebHookListenerAddUpdateStory() throws Exception {
-    	
+    public void testWebHookListenerAddStory() throws Exception {
+    	executeAddUpdate(jsonRequest);
+    }
+    
+    @Test
+    public void testWebHookListenerUpdateStory() throws Exception {
+    	String jsonRequestUpdate = jsonRequest.replace(AppConstant.ACTIVITY_CREATE,AppConstant.ACTIVITY_UPDATE);
+    	executeAddUpdate(jsonRequestUpdate);
+    }
+    
+    public void executeAddUpdate(String jsonRequest) throws Exception {
         ResultActions result = this.mockMvc.perform(post("/webHookListener")
         .contentType(MediaType.APPLICATION_JSON_UTF8).content(jsonRequest));
         
@@ -83,7 +95,11 @@ public class SheetUpdaterControllerTest {
         verify(sheetService).getCurrentSheetDefinition(argument.capture());
         assertNotNull(argument.getValue());
         
+        ApiResponse apiResponse = new ApiResponse();
+        when(sheetService.addUpdateStory(any(), any())).thenReturn(apiResponse);
+        doReturn(apiResponse).when(sheetService).addUpdateStory(any(), any());
         verify(sheetService,times(1)).addUpdateStory(any(),any());
+
         
         result.andExpect(status().isOk());
         result.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
@@ -97,6 +113,9 @@ public class SheetUpdaterControllerTest {
         ResultActions result = this.mockMvc.perform(post("/webHookListener")
         .contentType(MediaType.APPLICATION_JSON_UTF8).content(jsonRequestMove));
         
+        ApiResponse apiResponse = new ApiResponse();
+        when(sheetService.moveStory(any(), any())).thenReturn(apiResponse);
+        doReturn(apiResponse).when(sheetService).addUpdateStory(any(), any());
         verify(sheetService,times(1)).moveStory(any(), any());
         
         result.andExpect(status().isOk());
