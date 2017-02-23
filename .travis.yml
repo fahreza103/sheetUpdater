@@ -6,6 +6,7 @@ jdk:
 
 before_install:
   - chmod +x mvnw
+  - mkdir ~/.credentials
   - mkdir ~/.credentials/sheets.googleapis.com-sepulsa-sheetUpdater/
   - cp StoredCredential ~/.credentials/sheets.googleapis.com-sepulsa-sheetUpdater/
 
