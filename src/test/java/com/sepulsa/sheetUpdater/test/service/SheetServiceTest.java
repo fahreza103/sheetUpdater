@@ -21,6 +21,7 @@ import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import com.sepulsa.sheetUpdater.constant.AppConstant;
 import com.sepulsa.sheetUpdater.object.ApiResponse;
+import com.sepulsa.sheetUpdater.object.Content;
 import com.sepulsa.sheetUpdater.object.SheetDefinition;
 import com.sepulsa.sheetUpdater.object.SheetDefinitionDetail;
 import com.sepulsa.sheetUpdater.object.WebHook;
@@ -152,7 +153,7 @@ public class SheetServiceTest {
 		
 		// Test update story
 		webHook.setKind(AppConstant.ACTIVITY_UPDATE);
-		webHook.getPrimaryResources().get(0).setId("300000000");
+		webHook.getPrimaryResources().get(0).setId(STORY_IDS[2]);
 		webHook.getPrimaryResources().get(0).setName("test_change01");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
@@ -161,9 +162,28 @@ public class SheetServiceTest {
 		List<Object> dataCol = dataRow.get(0);
 		assertEquals("test_change01", dataCol.get(1));
 		
+		// Test Move story
+		Content storyChange = sheetService.getStoryChanges(webHook.getChanges());
+		assertEquals("Should return with kind story", "story", storyChange.getKind());
+		storyChange.getNewValues().setAfterId(STORY_IDS[0]);
+		response = sheetService.moveStory(webHook, sheetDefinition);
+		// Should placed in the last
+		dataRow = response.getUpdatedData();
+		dataCol = dataRow.get(dataRow.size() - 1);
+		assertEquals(STORY_IDS[2], dataCol.get(0));
+		
+		storyChange.getNewValues().setAfterId(null);
+		storyChange.getNewValues().setBeforeId(STORY_IDS[1]);
+		response = sheetService.moveStory(webHook, sheetDefinition);
+		// Should placed in the first
+		dataRow = response.getUpdatedData();
+		dataCol = dataRow.get(0);
+		assertEquals(STORY_IDS[2], dataCol.get(0));
+		
 		// Delete all values
 		googleSheet.spreadsheets().values().clear(spreadsheet.getSpreadsheetId(), "!A1:B", new ClearValuesRequest()).execute();
 	}
+	
 	
 	@After
 	public void tearDown() throws IOException {

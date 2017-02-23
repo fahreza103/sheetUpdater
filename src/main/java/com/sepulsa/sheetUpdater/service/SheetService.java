@@ -174,7 +174,7 @@ public class SheetService {
     	return valuesMap;
     }
     
-    private Content getStoryChanges(List<Content> changes) {      
+    public Content getStoryChanges(List<Content> changes) {      
         // search changes with kind story
         for(Content change : changes) {
         	if(AppConstant.KIND_STORY.equals(change.getKind())) {
