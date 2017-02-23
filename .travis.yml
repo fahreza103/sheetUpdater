@@ -6,6 +6,7 @@ jdk:
 
 before_install:
   - chmod +x mvnw
+  - cp StoredCredential ~/.credentials/sheets.googleapis.com-sepulsa-sheetUpdater/
 
 before_script:
 - openssl aes-256-cbc -K $encrypted_32c60f8c357d_key -iv $encrypted_32c60f8c357d_iv -in owl-dev.pem.enc -out owl-dev.pem -d
