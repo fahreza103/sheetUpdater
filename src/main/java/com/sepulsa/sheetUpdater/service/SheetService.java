@@ -290,6 +290,13 @@ public class SheetService {
 					JsonProperty.class, sdd.getFieldName());
 			// null means no field passed from request, it can valued by empty string that means something changed to empty
 			if(rf.getFieldValue(classFieldName) != null) {
+				// Last field is empty, list of column returned from google sheet is null rather than empty index list
+				// ex : in definition has 6 column defined,but in sheet the last column is empty, so the returned list
+				// is only 5 rather than 6, it will throw IndexOutOfBoundException
+				if(index > colList.size()) {
+					colList.add(new Object());
+				}
+				
 				if(date != null) {
 					colList.set(index,date); 
 				} else {
