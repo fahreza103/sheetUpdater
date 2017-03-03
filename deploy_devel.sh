@@ -8,6 +8,5 @@ git checkout $DEVELOPMENT_BRANCH
 git pull origin $DEVELOPMENT_BRANCH
 
 chmod +x mvnw
-mvn -N io.takari:maven:wrapper
 ./mvnw install -DskipTests -Dmaven.javadoc.skip=true -B -V
 

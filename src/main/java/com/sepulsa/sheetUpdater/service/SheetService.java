@@ -365,10 +365,13 @@ public class SheetService {
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
         List<List<Object>> rowValues = getRangeValues(service, sheetDefinition.getSpreadSheetId(), readRange);
+        log.info("rowValues :"+rowValues);
+        
         List<Content> changes = webHook.getChanges();
         List<Object> colList = null;
         
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+        log.info("rowValuesMap :"+rowValues);
 
         Content content = getStoryChanges(changes);
         // for update activity
