@@ -13,7 +13,7 @@ public interface AppConstant {
     
     public static final String[] PIVOTAL_FIELD_MAIN = new String[] {"kind","guid","project_version","message","highlight"};
     public static final String[] PIVOTAL_FIELD_PRIMARY_RES = new String[] {"id","name","url"};
-    public static final String[] PIVOTAL_FIELD_PROJECT = new String[] {"projectKind","projectName","projectId"};
+    public static final String[] PIVOTAL_FIELD_PROJECT = new String[] {"project_kind","project_name","project_id"};
     public static final String[] PIVOTAL_FIELD_DATETIME = new String[] {"created_at","updated_at"};
     
 }

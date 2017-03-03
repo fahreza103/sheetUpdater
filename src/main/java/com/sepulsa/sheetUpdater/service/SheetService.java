@@ -271,6 +271,9 @@ public class SheetService {
 				rf.setObject(webHook.getPrimaryResources().get(0));
 			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_PROJECT)) {
 				rf.setObject(webHook.getProject());
+				// use prefix project_
+				String[] projectFieldNames = sdd.getFieldName().split("_");
+				sdd.setFieldName(projectFieldNames.length > 1 ? projectFieldNames[1] : projectFieldNames[0]);
 			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_MAIN)) {			
 				rf.setObject(webHook);
 			} else if(StringTool.inArray(sdd.getFieldName(), AppConstant.PIVOTAL_FIELD_DATETIME)) {

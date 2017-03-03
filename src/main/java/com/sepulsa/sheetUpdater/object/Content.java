@@ -27,12 +27,6 @@ public class Content implements Serializable {
 	private String url;
 	@JsonProperty("initials")
 	private String initials;
-	@JsonProperty("projectKind")
-	private String projectKind;
-	@JsonProperty("projectName")
-	private String projectName;
-	@JsonProperty("projectId")
-	private String projectId;
 	@JsonProperty("original_values")
 	private Values originalValues;
 	@JsonProperty("new_values")
@@ -92,24 +86,7 @@ public class Content implements Serializable {
 	public void setChangeType(String changeType) {
 		this.changeType = changeType;
 	}
-	public String getProjectKind() {
-		return projectKind;
-	}
-	public void setProjectKind(String projectKind) {
-		this.projectKind = projectKind;
-	}
-	public String getProjectName() {
-		return projectName;
-	}
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
-	}
-	public String getProjectId() {
-		return projectId;
-	}
-	public void setProjectId(String projectId) {
-		this.projectId = projectId;
-	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

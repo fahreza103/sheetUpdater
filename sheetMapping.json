@@ -11,7 +11,7 @@
     "column" : "B"
   }, {
     "viewName" : "Project",
-    "fieldName" : "projectName",
+    "fieldName" : "project_name",
     "column" : "C"
   },{
     "viewName" : "Story Type",
