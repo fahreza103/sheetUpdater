@@ -361,6 +361,7 @@ public class SheetService {
     	
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
     	String readRange = getRangeFromSheetDefinition(sheetDefinition, 2,true);
+    	log.info("readRange : "+readRange);
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
         List<List<Object>> rowValues = getRangeValues(service, sheetDefinition.getSpreadSheetId(), readRange);
