@@ -161,14 +161,23 @@ public class SheetService {
             return values;
     }
     
-    private Map<String,SheetRowValues> convertRowValuesToMap (List<List<Object>> rowList) throws IOException {
-    	Map<String,SheetRowValues> valuesMap = new HashMap<String,SheetRowValues>();
+    private Map<String,SheetRowValues> convertRowValuesToMap (SheetDefinition sd, List<List<Object>> rowList) throws IOException {
+    	int id = 0;
     	int rowNum = 0;
+    	List<SheetDefinitionDetail> sddList = sd.getSheetDefinitionDetailListSorted();
+    	for(SheetDefinitionDetail sdd : sddList) {
+    		if(sdd.getFieldName().equals("id")) {
+    			break;
+    		}
+    		id++;
+    	}
+    	Map<String,SheetRowValues> valuesMap = new HashMap<String,SheetRowValues>();
+
     	for(List<Object> cols : rowList) {
     		SheetRowValues rowVal = new SheetRowValues();
     		rowVal.setColListValues(cols);
     		rowVal.setRowNum(rowNum);
-    		valuesMap.put((String) cols.get(0), rowVal);
+    		valuesMap.put((String) cols.get(id), rowVal);
     		rowNum++;
     	}
     	return valuesMap;
@@ -370,7 +379,7 @@ public class SheetService {
         List<Content> changes = webHook.getChanges();
         List<Object> colList = null;
         
-    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(sheetDefinition,rowValues);
         log.info("rowValuesMap :"+rowValues);
 
         Content content = getStoryChanges(changes);
@@ -419,7 +428,7 @@ public class SheetService {
     	Sheets service = getSheetsService();
         String readRange =  getRangeFromSheetDefinition(sheetDefinition, 2,true);
         List<List<Object>> rowValues = getRangeValues(service, sheetDefinition.getSpreadSheetId(),readRange);
-    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(rowValues);
+    	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(sheetDefinition,rowValues);
 
     	rowValues = moveStory(webHook, rowValues, rowValuesMap);
     	UpdateValuesResponse response = writeToSheet(service,sheetDefinition.getSpreadSheetId(),readRange,rowValues);	
