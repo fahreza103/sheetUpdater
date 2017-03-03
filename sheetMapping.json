@@ -1,37 +1,33 @@
 {
-  "spreadSheetId": "1fwCkPcAN2ZnsY-ytczC-L-IrKBm_kg-oJAPZMoekqbI",
-  "spreadSheetName":"TestSheet",
+  "spreadSheetId": "1iS1DPW0ocKXU4UG7iYj7vhHqn76VH3kMN5UkqM8wTVs",
+  "spreadSheetName":"Summary",
   "mapping": [{
-  	"viewName" : "Story Name",
+  	"viewName" : "Task Name",
     "fieldName" : "name",
+    "column" : "A"
+  }, {
+    "viewName" : "Id",
+    "fieldName" : "id",
     "column" : "B"
   }, {
-    "viewName" : "Description",
-    "fieldName" : "description",
+    "viewName" : "Project",
+    "fieldName" : "name",
     "column" : "C"
-  }, {
-    "viewName" : "Story Id",
-    "fieldName" : "id",
-    "column" : "A"
-  },{
-    "viewName" : "Status",
-    "fieldName" : "current_state",
-    "column" : "D"
   },{
     "viewName" : "Story Type",
     "fieldName" : "story_type",
+    "column" : "D"
+  },{
+    "viewName" : "Points",
+    "fieldName" : "estimate",
     "column" : "E"
   },{
-    "viewName" : "Point",
-    "fieldName" : "estimate",
+    "viewName" : "Status",
+    "fieldName" : "current_state",
     "column" : "F"
   },{
-    "viewName" : "Labels",
-    "fieldName" : "labels",
+    "viewName" : "Assigned To",
+    "fieldName" : "owned_by_id",
     "column" : "G"
-  },{
-    "viewName" : "Update Time",
-    "fieldName" : "updated_at",
-    "column" : "H"
   }  ]
 }
