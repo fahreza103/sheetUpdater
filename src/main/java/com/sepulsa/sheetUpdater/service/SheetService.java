@@ -333,7 +333,7 @@ public class SheetService {
     	}
     	
     	Sheets service = getSheetsService();
-        List<List<Object>> rowValues = getRangeValues(service, sd.getSpreadSheetId(), "!A1:B1");
+        List<List<Object>> rowValues = getRangeValues(service, sd.getSpreadSheetId(), sd.getSpreadSheetName()+"!A1:B1");
     	
     	// Update if different, it means there's change in the sheetMapping.json
     	// and sheet must be empty, if not, nothing changed
