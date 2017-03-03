@@ -1,4 +1,4 @@
-package con.sepulsa.sheetUpdater.test.repository;
+package com.sepulsa.sheetUpdater.test.repository;
 
 import static org.junit.Assert.assertEquals;
 
