@@ -7,5 +7,6 @@ git fetch origin
 git checkout $DEVELOPMENT_BRANCH
 git pull origin $DEVELOPMENT_BRANCH
 
-./mvnw install -DskipTests
+chmod +x mvnw
+./mvnw install -DskipTests -Dmaven.javadoc.skip=true -B -V
 
