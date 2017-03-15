@@ -30,6 +30,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
+import com.google.api.services.sheets.v4.model.DimensionRange;
+import com.google.api.services.sheets.v4.model.MoveDimensionRequest;
+import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.constant.AppConstant;
@@ -177,7 +183,11 @@ public class SheetService {
     		SheetRowValues rowVal = new SheetRowValues();
     		rowVal.setColListValues(cols);
     		rowVal.setRowNum(rowNum);
-    		valuesMap.put((String) cols.get(id), rowVal);
+    		if(id >= cols.size()) {
+    			valuesMap.put("-1", rowVal);    			
+    		} else {
+    			valuesMap.put((String) cols.get(id), rowVal);
+    		}
     		rowNum++;
     	}
     	return valuesMap;
@@ -201,50 +211,85 @@ public class SheetService {
                 .execute();
     }
     
-    private List<List<Object>> moveStory(WebHook webHook,List<List<Object>> rowValues, Map<String,SheetRowValues> rowValuesMap) {
+	public Integer getSheetId(Spreadsheet spreadSheet) {
+		Integer sheetId = null;
+		com.google.api.services.sheets.v4.model.Sheet sheet = spreadSheet.getSheets().get(0);
+		sheetId = sheet.getProperties().getSheetId();
+		return sheetId;
+	}
+    
+    public BatchUpdateSpreadsheetResponse moveRow(Spreadsheet spreadsheet, Integer startIndex,
+    			Integer endIndex, Integer destinationIndex) throws IOException {
+    	Sheets service = getSheetsService();
+		List<Request> requests = new ArrayList<>();
+		MoveDimensionRequest mdr = new MoveDimensionRequest();
+		
+		DimensionRange drange = new DimensionRange();
+		drange.setDimension("ROWS");
+		drange.setStartIndex(startIndex);
+		drange.setEndIndex(endIndex);
+		drange.setSheetId(getSheetId(spreadsheet));
+		
+		mdr.setSource(drange);
+		mdr.setDestinationIndex(destinationIndex);
+
+		requests.add(new Request().setMoveDimension(mdr));
+
+		BatchUpdateSpreadsheetRequest body =
+		        new BatchUpdateSpreadsheetRequest().setRequests(requests);
+		BatchUpdateSpreadsheetResponse response =
+				service.spreadsheets().batchUpdate(spreadsheet.getSpreadsheetId(), body).execute();
+		return response;
+    }
+    
+    private Integer moveStory(Spreadsheet spreadsheet,WebHook webHook, Map<String,SheetRowValues> rowValuesMap) throws IOException {
     	Content storyChanges = getStoryChanges(webHook.getChanges());
     	
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	String afterId = storyChanges.getNewValues().getAfterId();
     	String beforeId = storyChanges.getNewValues().getBeforeId();
-    	SheetRowValues rowValue = rowValuesMap.get(storyId);
-    	int rowNum = rowValue.getRowNum();
+    	SheetRowValues currentIdStory = rowValuesMap.get(storyId);
+		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
+       	SheetRowValues beforeIdStory = rowValuesMap.get(beforeId);
     	
-    	log.info("Story row position : "+rowNum);
+    	log.info("Story row position : "+currentIdStory.getRowNum());
     	// Placed on the top of the list in tracker
     	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
-    		log.info("Move into first position");
+    		log.info("Move beforeId "+beforeId);
+    		moveRow(spreadsheet, currentIdStory.getRowNum(), currentIdStory.getRowNum()+1, beforeIdStory.getRowNum());
+        	
     		// Placed at the first index
-    		rowValues.add(0,rowValue.getColListValues());
-			// Remove current position
-    		rowNum++;
-			rowValues.remove(rowNum);
+//    		rowValues.add(0,rowValue.getColListValues());
+//			// Remove current position
+//    		rowNum++;
+//			rowValues.remove(rowNum);
 		// Placed on the bottom of the list in tracker
     	} else if (!StringTool.isEmpty(afterId) && StringTool.isEmpty(beforeId)) {
-    		log.info("Move into last position");
-    		// Placed at the last index
-    		rowValues.add(rowValue.getColListValues());
-			// Remove current position
-			rowValues.remove(rowNum);
-    	// Placed in the middle, between story
+    		log.info("Move afterId "+afterId);
+    		moveRow(spreadsheet, currentIdStory.getRowNum(), currentIdStory.getRowNum()+1, afterIdStory.getRowNum()+1);
+//    		// Placed at the last index
+//    		rowValues.add(rowValue.getColListValues());
+//			// Remove current position
+//			rowValues.remove(rowNum);
+//    	// Placed in the middle, between story
     	} else if (!StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
-    		log.info("Move after id "+afterId);
-    		SheetRowValues afterIdStory = rowValuesMap.get(afterId);
-    		int position = afterIdStory.getRowNum() + 1;
+    		log.info("Move after id "+afterId+ "| before id "+beforeId);
 
-    		// Placed after / below afterId
-    		rowValues.add(position,rowValue.getColListValues());			
-    		// Move up, current position located below the target position
-    		if(rowNum >= position) {
-    			rowNum++;
-    		}
-			// Remove current position
-			rowValues.remove(rowNum);
+    		moveRow(spreadsheet, currentIdStory.getRowNum(), currentIdStory.getRowNum()+1, afterIdStory.getRowNum()+1);
+//    		int position = afterIdStory.getRowNum() + 1;
+
+//    		// Placed after / below afterId
+//    		rowValues.add(position,rowValue.getColListValues());			
+//    		// Move up, current position located below the target position
+//    		if(rowNum >= position) {
+//    			rowNum++;
+//    		}
+//			// Remove current position
+//			rowValues.remove(rowNum);
     	} else {
     		log.info("No afterId or beforeId defined, not moving anything"	);
     	}
-    	log.debug(rowValues);
-    	return rowValues;
+    	return currentIdStory.getRowNum();
     }
     
     private String getRangeFromSheetDefinition(SheetDefinition sheetDefinition, Integer startRow,Boolean allRow) {
@@ -379,7 +424,7 @@ public class SheetService {
     	writeCheckEmptyHeader(service, sheetDefinition);
     	
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
-    	String readRange = getRangeFromSheetDefinition(sheetDefinition, 2,true);
+    	String readRange = getRangeFromSheetDefinition(sheetDefinition, 1,true);
     	log.info("readRange : "+readRange);
     	String storyId = webHook.getPrimaryResources().get(0).getId();
     	
@@ -403,15 +448,16 @@ public class SheetService {
             colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);
             
         	// placed at the top of icebox, after the latest story in current / backlog
-            if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
-
-            	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
-            	int newStoryPosition = afterIdSheet.getRowNum() + 1;
-            	rowValues.add(newStoryPosition,colList);
-            // no afterId defined, which means no story in current / backlog
-            } else {
-                rowValues.add(0,colList);
-            }
+//            if(!StringTool.isEmpty(content.getNewValues().getAfterId())) {
+//
+//            	SheetRowValues afterIdSheet = rowValuesMap.get(content.getNewValues().getAfterId());
+//            	int newStoryPosition = afterIdSheet.getRowNum() + 1;
+//            	rowValues.add(newStoryPosition,colList);
+//            // no afterId defined, which means no story in current / backlog
+//            } else {
+            // Placed at the bottom
+            rowValues.add(colList);
+//            }
 
         } else if (AppConstant.ACTIVITY_UPDATE.equals(kind)) {
         	colList = updatedStory.getColListValues();
@@ -424,7 +470,7 @@ public class SheetService {
         	rowValues.set(updatedStory.getRowNum(), colList);
         	rowValuesMap.put(storyId, updatedStory);
         	// if there is an update to start the project, this story will move to the top
-        	rowValues = moveStory(webHook, rowValues, rowValuesMap);
+//        	rowValues = moveStory(webHook, rowValues, rowValuesMap);
         }
 
         log.info("Write to spreadsheetId" +sheetDefinition.getSpreadSheetId()+" readRange : "+readRange);
@@ -436,12 +482,18 @@ public class SheetService {
     
     public ApiResponse moveStory(WebHook webHook, SheetDefinition sheetDefinition) throws IOException {
     	Sheets service = getSheetsService();
-        String readRange =  getRangeFromSheetDefinition(sheetDefinition, 2,true);
+        String readRange =  getRangeFromSheetDefinition(sheetDefinition, 1,true);
         List<List<Object>> rowValues = getRangeValues(service, sheetDefinition.getSpreadSheetId(),readRange);
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(sheetDefinition,rowValues);
+    	
+    	Spreadsheet spreadsheet = service.spreadsheets().get(sheetDefinition.getSpreadSheetId()).execute();
 
-    	rowValues = moveStory(webHook, rowValues, rowValuesMap);
-    	UpdateValuesResponse response = writeToSheet(service,sheetDefinition.getSpreadSheetId(),readRange,rowValues);	
+    	Integer rowUpdate = moveStory(spreadsheet,webHook, rowValuesMap);
+    	
+    	UpdateValuesResponse response = new UpdateValuesResponse();
+    	response.setSpreadsheetId(spreadsheet.getSpreadsheetId());
+    	response.setUpdatedRows(rowUpdate);
+    	
     	return getApiResponse(response,rowValues);
     }
     

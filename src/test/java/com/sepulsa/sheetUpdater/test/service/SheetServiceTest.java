@@ -35,7 +35,7 @@ public class SheetServiceTest {
 
 	private static final String UNIT_TEST_SHEET_FILE = "spreadsheet_testId.txt";
 	private static final String UNIT_TEST_SPREADSHEET_SHEET_NAME = "TestSheet";
-	private static final String[] STORY_IDS = new String[]{"100000000","200000000","300000000"};
+	private static final String[] STORY_IDS = new String[]{"100000000","200000000","300000000","400000000"};
 	private Sheets googleSheet;
 	private SheetService sheetService;
 	private JsonService jsonService;
@@ -109,6 +109,8 @@ public class SheetServiceTest {
     	FileTool.writeFile("spreadsheet_testId.txt", spreadsheet.getSpreadsheetId());	
     	return spreadsheet;
 	}
+	
+
 
 	@Test
 	public void testAuthorizedShouldReturnCredentials() throws IOException, GeneralSecurityException {
@@ -137,50 +139,72 @@ public class SheetServiceTest {
 		ApiResponse response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertNotNull("response should not null", response);
 		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
-		assertEquals("updated row shoule be 1",new Integer(1),response.getUpdatedRows());
+		assertEquals("updated row shoule be 2",new Integer(2),response.getUpdatedRows());
 		
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[1]);
 		webHook.getPrimaryResources().get(0).setName("test2");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
-		assertEquals("updated row shoule be 2",new Integer(2),response.getUpdatedRows());
+		assertEquals("updated row shoule be 3",new Integer(3),response.getUpdatedRows());
 		
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[2]);
 		webHook.getPrimaryResources().get(0).setName("test3");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
-		assertEquals("updated row shoule be 3",new Integer(3),response.getUpdatedRows());
+		assertEquals("updated row shoule be 4",new Integer(4),response.getUpdatedRows());
+		
+		webHook.getPrimaryResources().get(0).setId(STORY_IDS[3]);
+		webHook.getPrimaryResources().get(0).setName("test4");
+		response = sheetService.addUpdateStory(webHook, sheetDefinition);
+		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
+		assertEquals("updated row shoule be 5",new Integer(5),response.getUpdatedRows());
 		
 		// Test update story
 		webHook.setKind(AppConstant.ACTIVITY_UPDATE);
-		webHook.getPrimaryResources().get(0).setId(STORY_IDS[2]);
+		webHook.getPrimaryResources().get(0).setId(STORY_IDS[3]);
 		webHook.getPrimaryResources().get(0).setName("test_change01");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
 		
 		List<List<Object>> dataRow = response.getUpdatedData();
-		List<Object> dataCol = dataRow.get(0);
+		List<Object> dataCol = dataRow.get(dataRow.size()-1);
 		assertEquals("test_change01", dataCol.get(1));
 		
 		// Test Move story
+		webHook.getPrimaryResources().get(0).setId(STORY_IDS[1]);
 		Content storyChange = sheetService.getStoryChanges(webHook.getChanges());
 		assertEquals("Should return with kind story", "story", storyChange.getKind());
-		storyChange.getNewValues().setAfterId(STORY_IDS[0]);
+		storyChange.getNewValues().setAfterId(STORY_IDS[3]);
+		
+		System.out.println("spreadsheet :"+spreadsheet.getSpreadsheetId());
+		
+//		sheetService.moveRow(spreadsheet, 3, 4, 2);
 		response = sheetService.moveStory(webHook, sheetDefinition);
 		// Should placed in the last
-		dataRow = response.getUpdatedData();
-		dataCol = dataRow.get(dataRow.size() - 1);
-		assertEquals(STORY_IDS[2], dataCol.get(0));
+//		dataRow = response.getUpdatedData();
+//		dataCol = dataRow.get(dataRow.size() - 1);
+		assertEquals(new Integer(2), response.getUpdatedRows());
 		
+		// Moveup
+		storyChange.getNewValues().setBeforeId(STORY_IDS[0]);
 		storyChange.getNewValues().setAfterId(null);
-		storyChange.getNewValues().setBeforeId(STORY_IDS[1]);
 		response = sheetService.moveStory(webHook, sheetDefinition);
-		// Should placed in the first
-		dataRow = response.getUpdatedData();
-		dataCol = dataRow.get(0);
-		assertEquals(STORY_IDS[2], dataCol.get(0));
+		assertEquals(new Integer(4), response.getUpdatedRows());
 		
-		// Delete all values
+		storyChange.getNewValues().setBeforeId(STORY_IDS[3]);
+		storyChange.getNewValues().setAfterId(STORY_IDS[2]);
+		response = sheetService.moveStory(webHook, sheetDefinition);
+		assertEquals(new Integer(1), response.getUpdatedRows());
+//		
+//		storyChange.getNewValues().setAfterId(null);
+//		storyChange.getNewValues().setBeforeId(STORY_IDS[1]);
+//		response = sheetService.moveStory(webHook, sheetDefinition);
+//		// Should placed in the first
+//		dataRow = response.getUpdatedData();
+//		dataCol = dataRow.get(0);
+//		assertEquals(STORY_IDS[2], dataCol.get(0));
+		
+		//Delete all values
 		googleSheet.spreadsheets().values().clear(spreadsheet.getSpreadsheetId(), "!A1:B", new ClearValuesRequest()).execute();
 	}
 	
