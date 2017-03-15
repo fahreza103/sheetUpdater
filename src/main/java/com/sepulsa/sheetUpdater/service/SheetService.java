@@ -253,7 +253,7 @@ public class SheetService {
        	SheetRowValues beforeIdStory = rowValuesMap.get(beforeId);
     	
     	log.info("Story row position : "+currentIdStory.getRowNum());
-    	// Placed on the top of the list in tracker
+    	// Used move row rather than swaping update data
     	if(StringTool.isEmpty(afterId) && !StringTool.isEmpty(beforeId)) {
     		log.info("Move beforeId "+beforeId);
     		moveRow(spreadsheet, currentIdStory.getRowNum(), currentIdStory.getRowNum()+1, beforeIdStory.getRowNum());

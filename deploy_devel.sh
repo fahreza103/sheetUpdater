@@ -7,6 +7,6 @@ git fetch origin
 git checkout $DEVELOPMENT_BRANCH
 git pull origin $DEVELOPMENT_BRANCH
 
-
-./mvnw clean install -DskipTests
+./mvnw -N -q io.takari:maven:wrapper
+./mvnw install -DskipTests
 
