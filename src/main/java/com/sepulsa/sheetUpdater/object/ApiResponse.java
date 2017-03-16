@@ -15,6 +15,8 @@ public class ApiResponse implements Serializable {
 	private Integer updatedColumns;
 	private Integer updatedCells;
 	private Integer updatedRows;
+	private Integer moveRowBefore;
+	private Integer moveRowAfter;
 	private List<List<Object>> updatedData = new ArrayList<List<Object>>();
 	
 	public Integer getStatus() {
@@ -64,6 +66,18 @@ public class ApiResponse implements Serializable {
 	}
 	public void setUpdatedData(List<List<Object>> updatedData) {
 		this.updatedData = updatedData;
+	}
+	public Integer getMoveRowBefore() {
+		return moveRowBefore;
+	}
+	public void setMoveRowBefore(Integer moveRowBefore) {
+		this.moveRowBefore = moveRowBefore;
+	}
+	public Integer getMoveRowAfter() {
+		return moveRowAfter;
+	}
+	public void setMoveRowAfter(Integer moveRowAfter) {
+		this.moveRowAfter = moveRowAfter;
 	}
 	
 	

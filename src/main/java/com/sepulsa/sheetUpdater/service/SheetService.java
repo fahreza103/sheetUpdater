@@ -39,14 +39,12 @@ import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.sepulsa.sheetUpdater.constant.AppConstant;
-import com.sepulsa.sheetUpdater.entity.Sheet;
 import com.sepulsa.sheetUpdater.object.ApiResponse;
 import com.sepulsa.sheetUpdater.object.Content;
 import com.sepulsa.sheetUpdater.object.SheetDefinition;
 import com.sepulsa.sheetUpdater.object.SheetDefinitionDetail;
 import com.sepulsa.sheetUpdater.object.SheetRowValues;
 import com.sepulsa.sheetUpdater.object.WebHook;
-import com.sepulsa.sheetUpdater.repository.SheetRepository;
 import com.sepulsa.sheetUpdater.util.DateTool;
 import com.sepulsa.sheetUpdater.util.ReflectionUtil;
 import com.sepulsa.sheetUpdater.util.StringTool;
@@ -56,8 +54,8 @@ public class SheetService {
 	private Logger log = Logger.getLogger(SheetService.class);
 	
 	/** Sheet repository */
-	@Autowired
-	private SheetRepository sheetRepo;
+//	@Autowired
+//	private SheetRepository sheetRepo;
 	
 	@Autowired
 	private JsonService jsonService;
@@ -381,37 +379,37 @@ public class SheetService {
     }
     
     public SheetDefinition getCurrentSheetDefinition(String sheetMappingJson) throws IOException {
-    	Sheet sheet = sheetRepo.findById(new Long(1));
+//    	Sheet sheet = sheetRepo.findById(new Long(1));
     	SheetDefinition sd = null;
-    	// Save if empty
-    	if(sheet == null) {
+//    	// Save if empty
+//    	if(sheet == null) {
     		sd = jsonService.convertToObject(sheetMappingJson, SheetDefinition.class);
-    		log.info("Sheet is empty, insert into db");
-    		sheet = new Sheet();
-    		sheet.setId(new Long(1));
-    		sheet.setSheetId(sd.getSpreadSheetId());
-    		sheet.setStructure(sheetMappingJson);
-    		sheetRepo.save(sheet);
-    	} else {
-        	sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
-    	}
-    	
+//    		log.info("Sheet is empty, insert into db");
+//    		sheet = new Sheet();
+//    		sheet.setId(new Long(1));
+//    		sheet.setSheetId(sd.getSpreadSheetId());
+//    		sheet.setStructure(sheetMappingJson);
+//    		sheetRepo.save(sheet);
+//    	} else {
+//        	sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
+//    	}
+//    	
     	Sheets service = getSheetsService();
         List<List<Object>> rowValues = getRangeValues(service, sd.getSpreadSheetId(), sd.getSpreadSheetName()+"!A1:B1");
-    	
-    	// Update if different, it means there's change in the sheetMapping.json
-    	// and sheet must be empty, if not, nothing changed
-    	if(!sheetMappingJson.equals(sheet.getStructure()) && rowValues.isEmpty()) {
-    		log.info("Header is empty and there's change in sheetMapping.json file");
-    		sheet.setStructure(sheetMappingJson);
-    		sheetRepo.save(sheet);
-    		
-        	sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
+//    	
+//    	// Update if different, it means there's change in the sheetMapping.json
+//    	// and sheet must be empty, if not, nothing changed
+    	if(!sheetMappingJson.equals(rowValues.isEmpty())) {
+    		log.info("Header is empty");
+//    		sheet.setStructure(sheetMappingJson);
+//    		sheetRepo.save(sheet);
+      		sd.setSheetIsEmpty(true);
+//        	sd = jsonService.convertToObject(sheet.getStructure(), SheetDefinition.class);
     	} 
-    	
-    	if(rowValues.isEmpty()) {
-    		sd.setSheetIsEmpty(true);
-    	}
+//    	
+//    	if(rowValues.isEmpty()) {
+//    		sd.setSheetIsEmpty(true);
+//    	}
     	sd.setStartColumn("A");
     	return sd;
     }
@@ -437,7 +435,7 @@ public class SheetService {
     	Map<String,SheetRowValues> rowValuesMap = convertRowValuesToMap(sheetDefinition,rowValues);
         log.info("rowValuesMap :"+rowValues);
 
-        Content content = getStoryChanges(changes);
+        getStoryChanges(changes);
         // for update activity
     	SheetRowValues updatedStory = rowValuesMap.get(storyId);
 
