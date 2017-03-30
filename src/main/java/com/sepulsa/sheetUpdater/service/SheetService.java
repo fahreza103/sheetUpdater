@@ -168,15 +168,15 @@ public class SheetService {
     private Map<String,SheetRowValues> convertRowValuesToMap (SheetDefinition sd, List<List<Object>> rowList) throws IOException {
     	int id = 0;
     	int rowNum = 0;
-    	List<SheetDefinitionDetail> sddList = sd.getSheetDefinitionDetailListSorted();
-    	for(SheetDefinitionDetail sdd : sddList) {
+
+    	Map<String,SheetRowValues> valuesMap = new HashMap<String,SheetRowValues>();
+    	for(SheetDefinitionDetail sdd : sd.getSheetDefinitionDetailListSorted()) {
     		if(sdd.getFieldName().equals("id")) {
+    			id = StringTool.getAlphabetPosition('A', sdd.getColumn().charAt(0));
     			break;
     		}
-    		id++;
     	}
-    	Map<String,SheetRowValues> valuesMap = new HashMap<String,SheetRowValues>();
-
+    	
     	for(List<Object> cols : rowList) {
     		SheetRowValues rowVal = new SheetRowValues();
     		rowVal.setColListValues(cols);
@@ -292,8 +292,10 @@ public class SheetService {
     
     private String getRangeFromSheetDefinition(SheetDefinition sheetDefinition, Integer startRow,Boolean allRow) {
     	List<SheetDefinitionDetail> sheetDefinitionDetails = sheetDefinition.getSheetDefinitionDetailListSorted();
-    	String endColumn = StringTool.getCharForNumber(sheetDefinitionDetails.size());
-    	String readRange = sheetDefinition.getSpreadSheetName()+"!"+sheetDefinition.getStartColumn()+startRow+":"+endColumn;
+//    	String startColumn = sheetDefinitionDetails.get(0).getColumn();
+    	String startColumn = "A";
+    	String endColumn = sheetDefinitionDetails.get(sheetDefinitionDetails.size()-1).getColumn();
+    	String readRange = sheetDefinition.getSpreadSheetName()+"!"+startColumn+startRow+":"+endColumn;
     	if(!allRow) {
     		// example , A1:F1 , only row 1
     		readRange += startRow;
@@ -343,15 +345,18 @@ public class SheetService {
 					colList.add(new Object());
 				}
 				
+				// Uppercase A start in 65 , A should be index 0
+				int colPos = StringTool.getAlphabetPosition('A',sdd.getColumn().charAt(0));
+				
 				if(date != null) {
-					colList.set(index,date); 
+					colList.set(colPos,date); 
 				} else {
 					// The value is collection, for example like labels
 					if(rf.getFieldValue(classFieldName) instanceof Collection<?>) {
 						List<Object> valueList = (List<Object>) rf.getFieldValue(classFieldName);
-						colList.set(index,StringTool.replaceEmpty(StringTool.joinListDelimited(valueList,","),"-"));
+						colList.set(colPos,StringTool.replaceEmpty(StringTool.joinListDelimited(valueList,","),"-"));
 					} else {
-						colList.set(index,StringTool.replaceEmpty(rf.getFieldValue(classFieldName),"-")); 	
+						colList.set(colPos,StringTool.replaceEmpty(rf.getFieldValue(classFieldName),"-")); 	
 					}
 				}
 			}
@@ -364,12 +369,18 @@ public class SheetService {
     
     private Boolean writeCheckEmptyHeader (Sheets service, SheetDefinition sheetDefinition) throws IOException {
     	String readRange = getRangeFromSheetDefinition(sheetDefinition,1,false);
+    	List<SheetDefinitionDetail> sddList = sheetDefinition.getSheetDefinitionDetailListSorted();
     	
         if(sheetDefinition.getSheetIsEmpty()) {
             List<List<Object>> rowValues = new ArrayList<List<Object>>();
         	List<Object> colValues = new ArrayList<Object>();
+        	Object [] newDataArray =  new Object[StringTool.getAlphabetPosition('A',sddList.get(sddList.size()-1).getColumn().charAt(0))+1];
+        	Arrays.fill(newDataArray, "");
+        	colValues = Arrays.asList(newDataArray);
         	for(SheetDefinitionDetail sdd : sheetDefinition.getSheetDefinitionDetailListSorted()) {
-        		colValues.add(sdd.getViewName());
+				// Uppercase A start in 65 , A should be index 0
+				int colPos = StringTool.getAlphabetPosition('A',sdd.getColumn().charAt(0));
+        		colValues.set(colPos,sdd.getViewName());
         	}
         	rowValues.add(colValues);
         	writeToSheet(service, sheetDefinition.getSpreadSheetId(), readRange, rowValues);
@@ -395,7 +406,7 @@ public class SheetService {
 //    	}
 //    	
     	Sheets service = getSheetsService();
-        List<List<Object>> rowValues = getRangeValues(service, sd.getSpreadSheetId(), sd.getSpreadSheetName()+"!A1:B1");
+        List<List<Object>> rowValues = getRangeValues(service, sd.getSpreadSheetId(), sd.getSpreadSheetName()+"!A1:Z1");
 //    	
 //    	// Update if different, it means there's change in the sheetMapping.json
 //    	// and sheet must be empty, if not, nothing changed
@@ -410,6 +421,7 @@ public class SheetService {
 //    	if(rowValues.isEmpty()) {
 //    		sd.setSheetIsEmpty(true);
 //    	}
+    	
     	sd.setStartColumn("A");
     	return sd;
     }
@@ -440,7 +452,8 @@ public class SheetService {
     	SheetRowValues updatedStory = rowValuesMap.get(storyId);
 
         if(AppConstant.ACTIVITY_CREATE.equals(kind)) {
-        	Object [] newDataArray =  new Object[sheetDefinitionDetails.size()];
+        	Object [] newDataArray =  new Object[StringTool.getAlphabetPosition
+        	                                     ('A',sheetDefinitionDetails.get(sheetDefinitionDetails.size()-1).getColumn().charAt(0))+1];
         	Arrays.fill(newDataArray, "");
         	colList = Arrays.asList(newDataArray);
             colList = fillColumnValue(sheetDefinitionDetails, colList, webHook);

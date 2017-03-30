@@ -36,6 +36,7 @@ public class SheetDefinitionDetail implements Serializable {
 		this.viewName = viewName;
 	}
 	
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

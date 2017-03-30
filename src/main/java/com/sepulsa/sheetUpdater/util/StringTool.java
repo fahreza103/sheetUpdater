@@ -1,11 +1,15 @@
 package com.sepulsa.sheetUpdater.util;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
-
+import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+
+import com.sepulsa.sheetUpdater.object.SheetDefinition;
+import com.sepulsa.sheetUpdater.object.SheetDefinitionDetail;
 
 
 
@@ -65,6 +69,43 @@ public class StringTool {
 	}
 	
 	/**
+	 * Group alphabet and return it as list string
+	 * @param sheetDefinition
+	 * @return
+	 */
+	public static List<String> getGroupColumn (SheetDefinition sheetDefinition) {
+		List<String> groupAlphabet = new ArrayList<String>();
+		List<String> group = new ArrayList<String>();
+		int lastValue=0;
+		int index = 0;
+		for(SheetDefinitionDetail sdd : sheetDefinition.getSheetDefinitionDetailListSorted()) {
+			int charValue = sdd.getColumn().charAt(0);
+			
+			if((charValue - lastValue)>1 && lastValue !=0) {
+				groupAlphabet.add(StringUtils.join(group,"|"));
+				group.clear();
+			}
+			
+			group.add(sdd.getColumn());
+			if (index == sheetDefinition.getSheetDefinitionDetailListSorted().size()-1) {
+				groupAlphabet.add(StringUtils.join(group,"|"));
+			}
+
+			
+			lastValue = charValue;
+			index++;
+		}
+		return groupAlphabet;
+	}
+	
+	public static Integer getAlphabetPosition(char startAlphabet, char endAlphabet) {
+		int startAlphabetIndex = startAlphabet;
+		int endAlphabetIndex =  endAlphabet;
+		return endAlphabetIndex-startAlphabetIndex;
+	}
+	
+	
+	/**
 	 * Convert collection object into single string with delimiter
 	 * @param collection
 	 * @param delimiter
@@ -73,5 +114,7 @@ public class StringTool {
 	public static String joinListDelimited(Collection<?> collection, String delimiter) {
 		return StringUtils.join(collection,delimiter);
 	}
+	
+	
 	
 }

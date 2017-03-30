@@ -70,20 +70,34 @@ public class SheetServiceTest {
     	sheetDefinition.setSheetIsEmpty(true);
     	sheetDefinition.setSpreadSheetId(spreadsheet.getSpreadsheetId());
     	sheetDefinition.setSpreadSheetName(UNIT_TEST_SPREADSHEET_SHEET_NAME);
-    	sheetDefinition.setStartColumn("A");
+    	//sheetDefinition.setStartColumn("A");
     	
     	List<SheetDefinitionDetail> definitionDetails = new ArrayList<SheetDefinitionDetail>();
     	SheetDefinitionDetail sdd = new SheetDefinitionDetail();
-    	sdd.setColumn("A");
+    	sdd.setColumn("B");
     	sdd.setFieldName("id");
     	sdd.setViewName("Story Id");
     	definitionDetails.add(sdd);
     	
     	SheetDefinitionDetail sdd2 = new SheetDefinitionDetail();
-    	sdd2.setColumn("B");
+    	sdd2.setColumn("D");
     	sdd2.setFieldName("name");
     	sdd2.setViewName("Story Name");
     	definitionDetails.add(sdd2);
+    	
+    	SheetDefinitionDetail sdd3 = new SheetDefinitionDetail();
+    	sdd3.setColumn("E");
+    	sdd3.setFieldName("project_name");
+    	sdd3.setViewName("Project");
+    	definitionDetails.add(sdd3);
+    	
+    	SheetDefinitionDetail sdd4 = new SheetDefinitionDetail();
+    	sdd4.setColumn("H");
+    	sdd4.setFieldName("estimate");
+    	sdd4.setViewName("Points");
+    	definitionDetails.add(sdd4);
+    	
+    	
     	sheetDefinition.setSheetDefinitionDetailList(definitionDetails);
 	}
 	
@@ -157,7 +171,7 @@ public class SheetServiceTest {
 		webHook.getPrimaryResources().get(0).setName("test4");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
-		assertEquals("updated row shoule be 5",new Integer(5),response.getUpdatedRows());
+		assertEquals("updated row should be 5",new Integer(5),response.getUpdatedRows());
 		
 		// Test update story
 		webHook.setKind(AppConstant.ACTIVITY_UPDATE);
@@ -168,7 +182,7 @@ public class SheetServiceTest {
 		
 		List<List<Object>> dataRow = response.getUpdatedData();
 		List<Object> dataCol = dataRow.get(dataRow.size()-1);
-		assertEquals("test_change01", dataCol.get(1));
+		assertEquals("test_change01", dataCol.get(3));
 		
 		// Test Move story
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[1]);
@@ -205,7 +219,7 @@ public class SheetServiceTest {
 //		assertEquals(STORY_IDS[2], dataCol.get(0));
 		
 		//Delete all values
-		googleSheet.spreadsheets().values().clear(spreadsheet.getSpreadsheetId(), "!A1:B", new ClearValuesRequest()).execute();
+		googleSheet.spreadsheets().values().clear(spreadsheet.getSpreadsheetId(), "!A1:Z", new ClearValuesRequest()).execute();
 	}
 	
 	
