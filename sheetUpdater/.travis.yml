@@ -1,0 +1,12 @@
+language: java
+
+sudo: false
+
+script: "mvn cobertura:cobertura"
+
+notifications:
+  email:
+    recipients:
+      - fahreza.tamara@gmail.com
+    on_success: always
+    on_failure: always
