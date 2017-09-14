@@ -152,25 +152,25 @@ public class SheetServiceTest {
 		webHook.getPrimaryResources().get(0).setName("test1");
 		ApiResponse response = sheetService.addUpdateStory(webHook, sheetDefinition);
 		assertNotNull("response should not null", response);
-		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
+		assertEquals("response flag should be true",true, response.getStatus());
 		assertEquals("updated row shoule be 2",new Integer(2),response.getUpdatedRows());
 		
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[1]);
 		webHook.getPrimaryResources().get(0).setName("test2");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
-		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
+		assertEquals("response flag should be true",true, response.getStatus());
 		assertEquals("updated row shoule be 3",new Integer(3),response.getUpdatedRows());
 		
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[2]);
 		webHook.getPrimaryResources().get(0).setName("test3");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
-		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
+		assertEquals("response flag should be true",true, response.getStatus());
 		assertEquals("updated row shoule be 4",new Integer(4),response.getUpdatedRows());
 		
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[3]);
 		webHook.getPrimaryResources().get(0).setName("test4");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
-		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
+		assertEquals("response flag should be true",true, response.getStatus());
 		assertEquals("updated row should be 5",new Integer(5),response.getUpdatedRows());
 		
 		// Test update story
@@ -178,7 +178,7 @@ public class SheetServiceTest {
 		webHook.getPrimaryResources().get(0).setId(STORY_IDS[3]);
 		webHook.getPrimaryResources().get(0).setName("test_change01");
 		response = sheetService.addUpdateStory(webHook, sheetDefinition);
-		assertEquals("response flag should be 1",AppConstant.FLAG_SUCCESS, response.getStatus());
+		assertEquals("response flag should be true",true, response.getStatus());
 		
 		List<List<Object>> dataRow = response.getUpdatedData();
 		List<Object> dataCol = dataRow.get(dataRow.size()-1);

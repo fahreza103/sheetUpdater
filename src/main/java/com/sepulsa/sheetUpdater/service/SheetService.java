@@ -511,7 +511,7 @@ public class SheetService {
     private ApiResponse getApiResponse(UpdateValuesResponse response,List<List<Object>> rowValues) {
     	ApiResponse apiResponse = new ApiResponse();
     	if(response != null) {
-			apiResponse.setStatus(AppConstant.FLAG_SUCCESS);
+			apiResponse.setStatus(true);
 			apiResponse.setMessage("SUCESS");
 			apiResponse.setSpreadsheetId(response.getSpreadsheetId());
 			apiResponse.setUpdatedCells(response.getUpdatedCells());
@@ -521,7 +521,7 @@ public class SheetService {
 			apiResponse.setUpdatedData(rowValues);
 		} else {
 	
-			apiResponse.setStatus(AppConstant.FLAG_FAILED);
+			apiResponse.setStatus(false);
 			apiResponse.setMessage("##### ERROR, failed to get response from google");
 		}
     	return apiResponse;

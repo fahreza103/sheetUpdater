@@ -1,6 +1,8 @@
 package com.sepulsa.sheetUpdater;
 
 import java.io.IOException;
+
+import org.jsondoc.spring.boot.starter.EnableJSONDoc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,6 +17,7 @@ import com.sepulsa.sheetUpdater.service.SheetService;
  */
 @SpringBootApplication
 @ComponentScan("com.sepulsa")
+@EnableJSONDoc
 public class SheetUpdaterApplication {
 
 	public static void main(String[] args) {

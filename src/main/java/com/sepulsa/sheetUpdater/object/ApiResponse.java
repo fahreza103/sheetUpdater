@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 public class ApiResponse implements Serializable {
 
 	private static final long serialVersionUID = -1627184577200154586L;
 	
-	private Integer status;
+	private Boolean status;
 	private String message;
 	private String updatedRange;
 	private String spreadsheetId;
@@ -19,10 +21,11 @@ public class ApiResponse implements Serializable {
 	private Integer moveRowAfter;
 	private List<List<Object>> updatedData = new ArrayList<List<Object>>();
 	
-	public Integer getStatus() {
+
+	public Boolean getStatus() {
 		return status;
 	}
-	public void setStatus(Integer status) {
+	public void setStatus(Boolean status) {
 		this.status = status;
 	}
 	public String getMessage() {
@@ -80,5 +83,9 @@ public class ApiResponse implements Serializable {
 		this.moveRowAfter = moveRowAfter;
 	}
 	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
 	
 }

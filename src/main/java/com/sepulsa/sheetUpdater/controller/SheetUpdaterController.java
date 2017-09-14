@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sepulsa.sheetUpdater.constant.AppConstant;
 import com.sepulsa.sheetUpdater.object.ApiResponse;
+import com.sepulsa.sheetUpdater.object.GlobalResponse;
 import com.sepulsa.sheetUpdater.object.SheetDefinition;
 import com.sepulsa.sheetUpdater.object.WebHook;
 import com.sepulsa.sheetUpdater.service.JsonService;
@@ -25,26 +26,21 @@ import com.sepulsa.sheetUpdater.util.FileTool;
  */
 @RestController
 @EnableAutoConfiguration
-public class SheetUpdaterController {
+public class SheetUpdaterController  extends Controller {
 
 	Logger log = Logger.getLogger(SheetUpdaterController.class);
-	
-	
-	@Autowired
-	private SheetService sheetService;
-	@Autowired
-	private JsonService jsonService;
-	
-	
+		
 	@RequestMapping("/Callback")
-	public String callBack () throws IOException {
+	public GlobalResponse callBack () throws IOException {
 		log.info("callback");
-		return "OK";
+		ApiResponse response = new ApiResponse();
+		response.setMessage("SUCCESS");
+		return super.goodResponse(response, true, "Success", "");
 	}
 	
 	
 	@RequestMapping(value = "/webHookListener")
-	public ApiResponse webHookListener (@RequestBody String json) throws IOException {
+	public GlobalResponse webHookListener (@RequestBody String json) throws IOException {
 		// Convert to JSON from string requestBody
 		WebHook webHook = jsonService.convertToObject(json,WebHook.class);
 		// Read sheetMapping.json (mapping column configuration)
@@ -62,7 +58,7 @@ public class SheetUpdaterController {
 			log.info("Perform move position");
 			apiResponse = sheetService.moveStory(webHook, sheetDefinition);
 		}	
-		return apiResponse == null ? new ApiResponse() : apiResponse;
+		return super.goodResponse(apiResponse, apiResponse.getStatus(), apiResponse.getMessage(),"");
 	}
 
 }
